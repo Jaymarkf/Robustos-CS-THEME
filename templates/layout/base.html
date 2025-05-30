@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js" lang="{{ locale_name }}">
+<html class="no-js {{lowercase (dashcase template_file)}} {{lowercase (dashcase page.title)}}" lang="{{ locale_name }}">
     <head>
         <title>{{ head.title }}</title>
         {{{ resourceHints }}}
@@ -9,7 +9,16 @@
 
         <link href="{{ head.favicon }}" rel="shortcut icon">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        
+        
+            <!-- Open Graph meta tags -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://robustos.com"> <!-- Replace with actual URL -->
+        <meta property="og:title" content="Robusto’s Cigar Superstore">
+        <meta property="og:description" content="Award Winning Cigars and Accessories">
+        <meta property="og:image" content="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/opengraph-logo.png?t=1730300368">
+        
+        
         <script>
             {{!-- Change document class from no-js to js so we can detect this in css --}}
             document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
@@ -31,6 +40,14 @@
         <script async src="{{cdn 'assets/dist/theme-bundle.font.js' resourceHint='preload' as='script'}}"></script>
 
         {{{stylesheet '/assets/css/theme.css'}}}
+        
+        {{!-- for optimization purpose --}}
+        {{#if template_file '==' 'pages/category'}}
+        {{{stylesheet '/assets/css/category.css'}}}
+        {{/if}}
+        {{#if template_file '==' 'pages/product'}}
+        {{{stylesheet '/assets/css/product.css'}}}
+        {{/if}}
 
         {{{head.scripts}}}
 
@@ -47,8 +64,167 @@
         {{~inject 'carouselArrowAndDotAriaLabel' (lang 'carousel.arrow_and_dot_aria_label')}}
         {{~inject 'carouselActiveDotAriaLabel' (lang 'carousel.active_dot_aria_label')}}
         {{~inject 'carouselContentAnnounceMessage' (lang 'carousel.content_announce_message')}}
+        {{!-- CUSTOM FONT --}}
+        <link rel="preload" href="{{cdn 'webdav:GothamBook.ttf'}}" as="font" type="font/ttf" crossorigin> 
+
+        <style>
+        /* @font-face declarations for each font weight */
+
+        /* Thin (100) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:Gotham-Thin.otf'}}"); /* Use OTF since TTF isn't available */
+            font-weight: 100;
+            font-display: swap; 
+        }
+
+        /* Extra Light (200) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:Gotham-XLight.otf'}}"); 
+            font-weight: 200;
+            font-display: swap; 
+        }
+
+        /* Light (300) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:GothamLight.ttf'}}"); 
+            font-weight: 300;
+            font-display: swap; 
+        }
+
+        /* Regular (400) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:GothamBook.ttf'}}"); /* Assuming GothamBook is the regular weight */
+            font-weight: 400;
+            font-display: swap; 
+        }
+
+        /* Medium (500) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:GothamMedium.ttf'}}"); 
+            font-weight: 500;
+            font-display: swap; 
+        }
+
+        /* Bold (700) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:GothamBold.ttf'}}"); 
+            font-weight: 700;
+            font-display: swap; 
+        }
+
+        /* Black (900) */
+        @font-face {
+            font-family: "Gotham";
+            src: url("{{cdn 'webdav:Gotham-Black.otf'}}"); 
+            font-weight: 900;
+            font-display: swap; 
+        }
+        </style>
     </head>
     <body>
+        <!-- to remove extra circle on badge if no cigar count etc... for category page e.g 91 cigars-->
+            <script>
+                  function isAppleDevice() {
+                    return /Mac|iPhone|iPad|iPod/.test(navigator.platform) || 
+                        (/iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream);
+                }
+                document.addEventListener("DOMContentLoaded", function () {
+                    function removeEmptyContainers() {
+                        const containers = document.querySelectorAll('.container-cigars-count');           
+                        for (const container of containers) {
+                            const cigarsCountSpan = container.querySelector('.cigars-count');
+                            const cigarsBrandSpan = container.querySelector('.cigars-brand');
+
+                            if (cigarsCountSpan.textContent.trim() === '' &&
+                                cigarsBrandSpan.textContent.trim() === '') {
+                                container.remove(); // Remove the container if both spans are empty
+                                 
+                                /** for badge alignment of mac os cuz having issue of line height **/
+                                if (isAppleDevice()) {
+                                   
+                                    document.querySelectorAll('.container-badges').forEach(function(element) {
+                                        element.classList.add('mac-os');
+                                    });
+                                  const productBadgesContainer = document.querySelector('.container-product-badges');
+                                    if (productBadgesContainer) {
+                                        productBadgesContainer.classList.add('mac-os');
+                                    }
+                                    
+                                }
+                            
+                            }
+                        }
+                    }
+
+                    // Initial call to remove empty containers on page load
+                    removeEmptyContainers();
+
+                    // Use MutationObserver to detect when new content is loaded
+                    const observer = new MutationObserver(function (mutations) {
+                        mutations.forEach(function (mutation) {
+                            if (mutation.addedNodes.length) {
+                                // Re-run the function when new nodes are added to the DOM
+                                removeEmptyContainers();
+                            }
+                        });
+                    });
+
+                    // Observe changes in the document body or a specific element containing paginated content
+                    // Observe changes in the document body
+                    const bodyNode = document.querySelector('body');
+                    const quickSearchNode = document.querySelector('.quickSearchResults');
+
+                    const config = { childList: true, subtree: true }; // Watch for new child elements
+
+                    // Observe body if found
+                    if (bodyNode) {
+                        observer.observe(bodyNode, config);
+                    }
+
+                    // Observe quickSearchResults if found
+                    if (quickSearchNode) {
+                        observer.observe(quickSearchNode, config);
+                    }
+                });
+            </script>
+        {{#if template_file '==' 'pages/product'}}
+            <script>
+                document.addEventListener("DOMContentLoaded",function(){
+                    if (navigator.platform.indexOf('Mac') > -1) {
+                        console.log(navigator.platform); // Check what value it logs
+                        const mainCategoryContainer = document.querySelector('.col-main-category-container');
+                        const productBadgesContainer = document.querySelector('.container-product-badges');
+                        const cigarRatingContainer = document.querySelector('.container-cigar-rating');
+                        if (mainCategoryContainer) {
+                            mainCategoryContainer.classList.add('mac-os');
+                        }
+                        if (productBadgesContainer) {
+                            productBadgesContainer.classList.add('mac-os');
+                        }
+                        if (cigarRatingContainer) {
+                            cigarRatingContainer.classList.add('mac-os');
+                        }
+                    }
+                });
+            </script>
+        {{/if}}
+        {{#if template_file '==' 'pages/category'}}
+            <script>
+                document.addEventListener("DOMContentLoaded",function(){
+                    if (navigator.platform.indexOf('Mac') > -1) {
+                        const category_cards = document.querySelector('[category_mac]');
+                        category_cards.classList.add('mac-os');
+                    }
+                });
+            </script>
+        {{/if}}
+
         <svg data-src="{{cdn 'img/icon-sprite.svg'}}" class="icons-svg-sprite"></svg>
 
         {{> components/common/header }}
@@ -82,5 +258,198 @@
         <script async defer src="{{cdn 'assets/dist/theme-bundle.main.js' resourceHint='preload' as='script'}}" onload="onThemeBundleMain()"></script>
 
         {{{footer.scripts}}}
+        <div class="age-verification">
+            <div class="age-verification-content">
+                <span class="age-verification-title">You must be <strong>21 years or older</strong> to enter this website. By clicking "Enter," you confirm that you are of legal age.</span>
+                <div class="age-verification-buttons">
+                    <button  id="legal-age">Enter</button>
+                    <button  id="not-legal-age">Exit</button>
+                </div>
+            </div>    
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            const legal_age = document.querySelector('#legal-age');
+            const not_legal_age = document.querySelector('#not-legal-age');
+            const age_verification = document.querySelector('.age-verification');
+
+            // Function to set item with expiration
+            function setItemWithExpiration(key, value, expirationInHours) {
+                const now = new Date();
+                const expirationTime = now.getTime() + expirationInHours * 60 * 60 * 1000;
+
+                const item = {
+                    value: value,
+                    expiration: expirationTime
+                };
+
+                localStorage.setItem(key, JSON.stringify(item));
+            }
+
+            // Function to get item and check expiration
+            function getItemWithExpiration(key) {
+                const itemStr = localStorage.getItem(key);
+                if (!itemStr) return null;
+
+                const item = JSON.parse(itemStr);
+                const now = new Date();
+
+                if (now.getTime() > item.expiration) {
+                    localStorage.removeItem(key); // Expired item, remove it
+                    return null;
+                }
+                return item.value;
+            }
+
+            legal_age.addEventListener('click', function () {
+                age_verification.style.display = 'none';
+                setItemWithExpiration('legal-age', true, 3); // Set expiration for 3 hours
+            });
+
+            not_legal_age.addEventListener('click', function () {
+                window.location.href = 'https://www.google.com';
+                localStorage.setItem('legal-age', false);
+            });
+
+            // Check if legal age is verified and not expired
+            if (getItemWithExpiration('legal-age') === true) {
+                age_verification.style.display = 'none';
+            }
+
+          
+
+        });
+        </script>
+        <script>
+            const containers = document.querySelectorAll('.card-img-container');
+
+            containers.forEach(container => {
+                const images = container.querySelectorAll('.card-image'); // Target images with the class 'card-image'
+                let currentIndex = 0;
+                let intervalId;
+
+                function showNextImage() {
+                    images[currentIndex].style.opacity = 0; // Hide current image
+                    currentIndex = (currentIndex + 1) % images.length; // Move to next image
+                    images[currentIndex].style.opacity = 1; // Show next image
+                }
+
+                function startSlideshow() {
+                    intervalId = setInterval(showNextImage, 1000); // Adjust interval as needed
+                }
+
+                function stopSlideshow() {
+                    clearInterval(intervalId);
+                    currentIndex = 0; // Reset to the first image
+                    images.forEach(img => img.style.opacity = 0); // Hide all images
+                    images[0].style.opacity = 1; // Show the first image again
+                }
+
+                // Start the slideshow on hover and stop on mouse out
+                container.addEventListener('mouseenter', startSlideshow);
+                container.addEventListener('mouseleave', stopSlideshow);
+            });
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+        <script>
+            document.addEventListener( 'DOMContentLoaded', function() {
+                var splide = new Splide( '.splide',{
+                    type: 'loop',
+                    perPage: 1,
+                    autoplay:true,
+                    arrows:false,
+                    pagination:false,
+                    speed:1200,
+                    autoHeight:true
+                } );
+                splide.mount();
+            } );
+            </script>
+        <script>
+                /**show and hide the search navigation bar**/
+                var x = document.querySelector('[search_trigger]');
+                var main_nav = document.querySelector('nav.navPages ul.navPages-list:not(.navPages-list--user)');
+                var hidden_search = document.querySelector('.con-in-nav-search');
+                var x_btn = document.querySelector('.button-x-navigation');
+                var nav_pages = document.querySelector('nav.navPages');
+                x.addEventListener('click',function(){  
+                    if(main_nav.style.display === 'none'){
+                        nav_pages.style.position = 'unset';
+                        main_nav.style.display = 'block';
+                        hidden_search.style.display = 'none';
+                    }else{
+                        nav_pages.style.position = 'relative';
+                        main_nav.style.display = 'none';
+                        hidden_search.style.display = 'block';
+                    }
+                    x_btn.addEventListener('click',function(){
+                        nav_pages.style.position = 'unset';
+                        main_nav.style.display = 'block';
+                        hidden_search.style.display = 'none';
+                    });
+                });
+
+        </script>
+        {{!-- this is for temporary for full width banner of promotion and events and shipping and refund policy --}}
+        {{#or (if page.title '==' 'Promotions') (if page.title '==' 'Events') (if page.title '==' 'Shipping & Refund Policy') (if page.title '==' 'Contact') (if page.title '==' 'Shipping Policy') (if page.title '==' 'Return and Refund Policy') (if page.title '==' 'About Us')}}
+            <style>
+               #main-content .container{
+                max-width:100% !important;
+               }
+               #main-content .container main.page{
+                margin:0;
+               }
+               #main-content .container .page-content--centered{
+                padding:0;
+                margin:0;
+                width:100%;
+               }
+               #main-content .container .page-content--centered .__mce_add_custom__{
+                width:100%;
+                height:auto;
+                object-fit: cover;
+               }
+               h1.page-heading{
+                   position:absolute;
+                   top:50%;
+                   left:50%;
+                   transform: translate(-50%,-50%);
+                   color:white;
+               }
+               main.page{
+                   position:relative;
+               }
+               .page-content.page-content--centered p:first-child{
+                   margin-bottom:0 !important;
+               }
+            </style>
+        {{else}}
+        {{/or}}
+        <script>
+            document.addEventListener("scroll", function () {
+            const main = document.querySelector("header.header .container-flex");
+            const header = document.querySelector("header.header");
+            
+            // Get the height of <header>
+            const headerBottom = header.getBoundingClientRect().bottom;
+            const header_con = document.querySelector('.container-flex');
+   
+            if (headerBottom <= 0) {
+                // Make <main> sticky
+                main.style.position = "fixed";
+                main.style.top = "0";
+                main.style.zIndex = "1";
+                main.style.background = "white"; // Optional for visibility
+                main.style.width = "100%";
+                main.classList.add('script-sticky');
+
+            } else {
+                // Reset <main> to its original position
+                main.style.position = "static";
+                main.classList.remove('script-sticky'); // Remove the class
+            }
+            });
+        </script>
     </body>
 </html>

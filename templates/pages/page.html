@@ -1,8 +1,11 @@
 {{#partial "page"}}
-
+{{!--
 {{> components/common/breadcrumbs breadcrumbs=breadcrumbs}}
-
+--}}
 <main class="page">
+    {{#or (if page.title '==' 'Shipping Policy') (if page.title '==' 'Return and Refund Policy')}}
+
+    {{else}}
     {{#unless theme_settings.hide_page_heading }}
         <h1 class="page-heading">{{ page.title }}</h1>
     {{/unless}}
@@ -16,15 +19,41 @@
         </ul>
     </nav>
     {{/if}}
-
     {{{region name="page_builder_content"}}}
-
+    {{/or}}
     <div class="page-content page-content--centered">
-        {{#replace '%%Syndicate%%' page.content}}
-            {{> components/page/rss_feed}}
-        {{else}}
-            <p>{{{page.content}}}</p>
-        {{/replace}}
+
+        {{#if (if page.title '==' 'Shipping Policy')}}
+        <div class="container-custom-template-page">
+            <img data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/1440w/carousel/12/banner-1.jpg?c=1"
+                 src="{{cdn 'img/loading.svg'}}"
+                 class="lazyload shipping-return"/>
+                 <h1>{{page.title}}</h1>
+           <span>
+            The product will ship according to availability. Preorders are not guaranteed and will be fulfilled on a first-come, first-served basis.<br>
+info@robustos.com 
+           </span>
+        </div>
+    {{else if page.title '==' 'Return and Refund Policy'}}
+    <div class="container-custom-template-page">
+        <img data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/1440w/carousel/12/banner-1.jpg?c=1"
+             src="{{cdn 'img/loading.svg'}}"
+             class="lazyload shipping-return"/>
+             <h1>{{page.title}}</h1>
+       <span>
+        As we sell specialty products, items purchased and shipped are not eligible for refund or return. However, if your order arrives damaged, please take a photo and contact us immediately. We will assess the situation to determine if any fault occurred on our end and arrange for a replacement if necessary.<br> 
+
+        info@robustos.com 
+       </span>
+    </div>
+
+    {{else}}
+    {{#replace '%%Syndicate%%' page.content}}
+    {{> components/page/rss_feed}}
+    {{else}}
+        <p>{{{page.content}}}</p>
+    {{/replace}}
+    {{/if}}
     </div>
 
     {{#if page.feed}}

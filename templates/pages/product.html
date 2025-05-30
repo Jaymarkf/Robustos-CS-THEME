@@ -8,6 +8,47 @@ product:
         limit: {{theme_settings.productpage_related_products_count}}
     similar_by_views:
         limit: {{theme_settings.productpage_similar_by_views_count}}
+products:
+    new:
+        limit: {{theme_settings.homepage_new_products_count}}
+    featured:
+        limit: {{theme_settings.homepage_featured_products_count}}
+    top_sellers:
+        limit: {{theme_settings.homepage_top_products_count}}
+gql: "query Experiment($productId: Int!) {
+    site {
+      product(entityId: $productId) {
+        entityId
+        variants(first: 50) {
+          edges {
+            node {
+              sku
+              defaultImage {
+                url(width: 450, height: 450)
+              }
+              entityId
+              productOptions(first: 50) {
+                edges {
+                  node {
+                    ... on MultipleChoiceOption {
+                      values {
+                        edges {
+                          node {
+                            entityId
+                            label
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}"  
 ---
 {{inject 'productId' product.id}}
 
@@ -18,23 +59,91 @@ product:
     {{#each product.shipping_messages}}
         {{> components/common/alert/alert-info message}}
     {{/each}}
-
-    <div>
-        {{> components/products/product-view}}
-
-        {{{region name="product_below_content"}}}
-
-        {{#if product.videos.list.length}}
-            {{> components/products/videos product.videos}}
-        {{/if}}
-
-        {{#all settings.show_product_reviews theme_settings.show_product_reviews (if theme_settings.show_product_details_tabs '!==' true)}}
-            {{> components/products/reviews reviews=product.reviews product=product urls=urls}}
-        {{/all}}
-
-        {{> components/products/tabs}}
+    <div class="container-main-product">
+        <div class="col-main-product-container">
+            {{> components/products/product-view gql=gql}}
+    
+            {{{region name="product_below_content"}}}
+    
+            {{#if product.videos.list.length}}
+                {{> components/products/videos product.videos}}
+            {{/if}}
+    
+            {{#all settings.show_product_reviews theme_settings.show_product_reviews (if theme_settings.show_product_details_tabs '!==' true)}}
+                {{> components/products/reviews reviews=product.reviews product=product urls=urls}}
+            {{/all}}
+    
+            {{> components/products/tabs}}
+        </div>
+        <div class="col-main-category-container">
+            <ul>
+                <li class="main-title-categ">CIGARS</li>
+                {{#each categories}}
+                    {{#if name '==' 'Cigars'}}
+                        {{#each children}}
+                            <li class="cigars-children">
+                                <a href="{{url}}">{{name}}</a>
+                            </li>
+                        {{/each}}
+                    {{/if}}
+                {{/each}}
+            </ul>
+        </div>
+        
     </div>
-
+    
     {{> components/products/schema}}
+    <script>
+        //on hover product option change main product image request done with 10-12-2024 by j
+        document.addEventListener("DOMContentLoaded", function() {
+    const gql = document.querySelectorAll('[gql_hover]');
+    const mainProductImage = document.querySelector('[data-main-image]');
+
+    let originalAttributes = {}; // Object to store the original attributes
+
+    if (mainProductImage) {
+        const mainProductImagePath = mainProductImage.src; // product main image src path
+        console.log(mainProductImagePath);
+
+        gql.forEach(function(data) {
+            const gqlImgPath = data.getAttribute('gql_hover');
+            data.addEventListener('mouseover', function() {
+                console.log(this);
+
+                // Store the original attributes except for 'src'
+                if (mainProductImage) {
+                    const attributes = mainProductImage.attributes;
+                    Array.from(attributes).forEach(attr => {
+                        if (attr.name !== 'src') {
+                            originalAttributes[attr.name] = attr.value;
+                            mainProductImage.removeAttribute(attr.name);
+                        }
+                    });
+
+                    // Update the src
+                    mainProductImage.src = gqlImgPath;
+                }
+            });
+
+            // Restore original attributes when mouse leaves
+            data.addEventListener('mouseout', function() {
+                if (mainProductImage) {
+                    // Reapply the original attributes
+                    Object.keys(originalAttributes).forEach(attr => {
+                        mainProductImage.setAttribute(attr, originalAttributes[attr]);
+                    });
+
+                    // Reset the src if needed
+                    mainProductImage.src = mainProductImagePath;
+                }
+            });
+        });
+    } else {
+        console.log('Main product image not found!');
+    }
+});
+
+
+    </script>
 {{/partial}}
 {{> layout/base}}

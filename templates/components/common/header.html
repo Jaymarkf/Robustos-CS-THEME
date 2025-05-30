@@ -15,20 +15,48 @@
         <span class="mobileMenu-toggleIcon">Toggle menu</span>
     </a>
     {{> components/common/navigation}}
-
-    {{#if page_type '===' 'default'}}
+    <div class="container-flex">
+        {{#if page_type '===' 'default'}}
         <h1 class="header-logo header-logo--{{theme_settings.logo-position}}">
-            {{> components/common/store-logo}}
+            {{> components/common/store-logo footer=false}}
         </h1>
-    {{else}}
-        <div class="header-logo header-logo--{{theme_settings.logo-position}}">
-            {{> components/common/store-logo}}
+        {{else}}
+            <div class="header-logo header-logo--{{theme_settings.logo-position}}">
+                {{> components/common/store-logo footer=false}}
+            </div>
+        {{/if}}
+        <div class="navPages-container" id="menu" data-menu>
+            {{> components/common/navigation-menu}}
         </div>
-    {{/if}}
-    <div class="navPages-container" id="menu" data-menu>
-        {{> components/common/navigation-menu}}
     </div>
+    
     {{{region name="header_navigation_bottom--global"}}}
+    <div class="navUser-item" custom-search-container>
+        <form class="form"  action="{{urls.search}}">
+            <input type="text" class="custom-search" placeholder="Search Cigars & Cigar Accessories" id="search" name="search_query" data-search-quick>
+          
+                <button class="custom-submit" type="submit" value="{{lang 'search.results.form_button_text'}}">
+                <svg>
+                    <use xlink:href="#icon-search"></use>
+                </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+    <!-- <div class="dropdown dropdown--quickSearch" id="quickSearch" aria-hidden="true" data-prevent-quick-search-close>
+    {{> components/common/quick-search name='nav-quick-search'}}
+    </div> -->
+
+    <section class="splide" aria-label="rotating promotion">
+        <div class="splide__track">
+              <ul class="splide__list">
+                  <li class="splide__slide">Browse our selection of <a href="#">Exclusive Rare Cigars</a> and <a href="#">Premium Cigar Accessories</a></li>
+                  <li class="splide__slide">Uncover the Finest <a href="#">Opus</a> X Cigars and <a href="/cigars/arturo-fuente/">Arturo Fuente</a> Creations</li>
+                  <li class="splide__slide">Discover <a href="/cigars/davidoff/">Davidoff</a> Unicorn Cigars</li>
+              </ul>
+        </div>
+      </section>
 </header>
 {{{region name="header_bottom--global"}}}
 {{{region name="header_bottom"}}}
+

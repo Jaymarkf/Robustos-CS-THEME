@@ -1,5 +1,5 @@
 {{#if children}}
-<a class="navPages-action has-subMenu{{#if is_active}} activePage{{/if}}"
+<a class="navPages-action has-subMenu{{#if is_active}} activePage{{/if}} first_parent"
    href="{{url}}"
    data-collapsible="navPages-{{id}}"
 >
@@ -10,7 +10,7 @@
 </a>
 <div class="navPage-subMenu" id="navPages-{{id}}" aria-hidden="true" tabindex="-1">
     <ul class="navPage-subMenu-list">
-        <li class="navPage-subMenu-item">
+        <li class="navPage-subMenu-item subcategory_level_1">
             <a class="navPage-subMenu-action navPages-action"
                href="{{url}}"
                aria-label="{{lang 'category.view_all.name' category=name}}"
@@ -19,7 +19,7 @@
             </a>
         </li>
         {{#each children}}
-            <li class="navPage-subMenu-item">
+            <li class="navPage-subMenu-item subcategory_level_1">
                 {{#if children}}
                     <a class="navPage-subMenu-action navPages-action has-subMenu{{#if is_active}} activePage{{/if}}"
                        href="{{url}}"
@@ -37,6 +37,7 @@
                             </i>
                         </span>
                     </a>
+                    {{!--
                     <ul class="navPage-childList" id="navPages-{{id}}">
                         {{#each children}}
                         <li class="navPage-childList-item">
@@ -49,7 +50,9 @@
                         </li>
                         {{/each}}
                     </ul>
+                    --}}
                 {{else}}
+                
                     <a class="navPage-subMenu-action navPages-action{{#if is_active}} activePage{{/if}}"
                        href="{{url}}"
                        aria-label="{{name}}"
@@ -62,8 +65,8 @@
     </ul>
 </div>
 {{else}}
-<a class="navPages-action{{#if is_active}} activePage{{/if}}"
-   href="{{url}}"
+<a class="navPages-action{{#if is_active}} activePage{{/if}} name--{{name}}"
+   href="{{#or (if name '==' 'Gift Pack') (if name '==' 'Gift Cards')}}/giftcertificates.php{{else}}{{url}}{{/or}}" 
    aria-label="{{name}}"
 >
     {{name}}

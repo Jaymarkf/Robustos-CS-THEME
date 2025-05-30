@@ -1,0 +1,317 @@
+#main-content{
+    .container{
+        @media(max-width:550px){
+            padding-top:40px;
+        }
+    }
+}
+h1.productView-title{
+    font-weight:500;
+    text-transform:uppercase;
+}
+h2.productView-brand span{
+    font-size:18px;
+    text-transform:uppercase;
+}
+//has been remove 26-11-2024 replacing with icon crown
+// .container-product-badges{
+//     position:absolute;
+//     right:0;
+//     top:0;
+//     z-index: 9;
+//     display:flex;
+//     flex-direction:column;
+//     align-items: flex-end;
+//     justify-content: flex-start;
+//     .badge{
+//         padding: 5px;
+//         font-family: Gotham;
+//         font-size: 14px;
+//         font-style: normal;
+//         font-weight: 600;
+//         line-height: 12px;
+//         letter-spacing: .36px;
+//         text-transform: uppercase;
+//         margin-bottom: 10px;
+//         width:max-content;
+//         border-radius:4px;
+//         &.badge--sale{
+//             background-color: #df0328;
+//             color: white;
+//         }
+//         &.badge--rare{
+//             background-color: #4C2F27;
+//             color: #ffd700;
+//         }
+//         &.badge--limited-edition{
+//             background-color: #CD7F32;
+//             color: #4b3621;
+//         }
+//         &.badge--new{
+//             background-color:#f2e6c9;
+//         }
+//         &.badge--best-seller{
+//             background-color:black;
+//             color:#c59949;
+//         }
+//     }
+// }
+.productView-img-container a{
+    text-decoration: none;
+}
+//new badge applied 26-11-2024
+.container-product-crown{
+    position: absolute;
+    left: 2px;
+    top: -16px;
+    transform: rotate(328deg);
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    z-index: 1;
+    .container-crown{
+        position:relative;
+        svg{
+            width:60px;
+            height:60px;
+        }
+        .crown-label{
+            position:absolute;
+            top:65%;
+            left:50%;
+            transform: translate(-50%,-65%);
+            color:white;
+            font-family:'Gotham',sans-serif;
+            font-weight:500;
+            font-size:13px;
+        }
+    }
+}
+.container-cigar-rating{
+    position:absolute;
+    z-index: 1;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    bottom:0;
+    right:0;;
+    width:120px;
+    height:120px;
+    .cigar-rating{
+        font-size: 26px;
+        color: #333;
+        font-weight: bold;
+    }
+    .rating-by{
+        font-family:'Gotham',sans-serif;
+        color:#333;
+        max-width: 93px;
+        text-align: center;
+        line-height: 16px;
+        font-size: 12px;
+        padding-bottom: 12px;
+    }
+    .circle-border{
+        // border: 2px solid #c59949;
+        border:2px solid var(--Red);
+        width: 120px;
+        height: 120px;
+        border-radius: 100%;
+        position: absolute;
+        @media(max-width:450px){
+            width:85px;
+            height:85px;
+        }
+    }
+}
+.container-product-badges.mac-os{
+    .badge{
+        padding-top:11px;
+        padding-bottom:0;
+    }
+}
+.container-cigar-rating.mac-os{
+    .cigar-rating{
+        line-height:20px;
+    }
+    .rating-by{
+        padding-bottom:0;
+    }
+}
+[data-product-option-change]{
+    label.form-option{
+        &:hover{
+            background-color: var(--Red);
+            color: white;
+        }
+    }
+}
+@media(max-width:800px){
+    section.productView-details.product-data{
+        order:0;
+    }
+
+    #main-content .container{
+        padding-left:var(--padding-x);
+        padding-right:var(--padding-x);
+        margin-left:0 !important;
+        margin-right:0 !important;
+    }
+}
+
+
+.container-product-badge.mac-os{
+.badge{
+    padding-bottom:0;
+    padding-top:11px;
+}
+}
+
+.product-description-custom {
+    margin-top:21px;
+    display: block;
+}
+button.slick-next{
+    right:0;
+}
+button.slick-prev{
+    left:0;
+}
+.productView{
+    margin:0 !important;
+}
+[data-quantity-change]{
+    width: max-content;
+    border: 1px solid #e5e5e5;
+}
+[data-action="dec"]{
+    border: none;
+    margin-right:3px !important;
+    font-size: 30px !important;
+    padding: 0 !important;
+    padding-left: 12px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    line-height:0 !important;
+}
+[data-action="inc"]{
+    border: none;
+    margin-left:3px !important;
+    font-size: 22px !important;
+    padding: 0 !important;
+    padding-right: 12px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    line-height:0 !important;
+}
+.add-to-cart-buttons {
+    padding-left:0 !important;
+}
+
+dl.productView-info dt{
+    float:left;
+}
+dd.productView-info-value{
+    float:left;
+    font-weight:bold;
+}
+.productView-info > :first-child{
+    margin-top:0 !important;
+}
+
+.productView-description{
+    padding-left:0;
+    ul.tabs[data-tab]{
+        border-bottom:1px solid #e5e5e5;
+    }
+}
+
+dl.productView-info{
+    .productView-info-name{
+        font-weight:bold;
+    }
+}
+
+
+.container-main-product{
+    display:flex;
+    @media(max-width:800px){
+        flex-direction:column;
+    }
+    .col-main-category-container{
+        padding-left:30px;
+        padding-right:30px;
+        border-left:1px solid #e5e5e5;
+        @media(max-width:800px){
+            border-left:none;
+            padding-left:10px;
+            padding-bottom:40px;
+        }
+        ul{
+            list-style: none;
+            margin-left:0;
+            width:max-content;
+            a{text-decoration: none;}
+            li{margin-bottom:7px;}
+            li.main-title-categ{
+                font-size: 24px;
+                text-transform: uppercase;
+                font-weight: 400;
+                font-family:"Gotham",sans-serif;
+            }
+            li.cigars-children a{
+                font-size: 16px;
+                text-transform: uppercase;
+                font-weight: bold;
+                position: relative;
+                width: max-content;
+                font-family:"Gotham",sans-serif;
+                transition:0.4s all;
+                &::before{
+                    transition:0.4s all;
+                    position:absolute;
+                    bottom:-2px;
+                    left:0;
+                    width:0%;
+                    background-color:var(--Red);
+                    height:2px;
+                    content:'';
+                }   
+                &:hover::before{
+                    width:100%;
+                }
+            }
+        }
+    }
+    .col-main-category-container.mac-os{
+        li.cigars-children{
+            line-height:22px;
+        }
+        a{
+            font-family:unset !important;
+        }
+    }
+}
+@media(max-width:800px){
+    #main-content{
+        margin-top:95px;
+    }
+}
+.productView-images{
+    @media(max-width:1200px){
+        .container-product-crown{
+            left:35px;
+        }
+    }
+}

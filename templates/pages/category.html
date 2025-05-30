@@ -1,7 +1,20 @@
 ---
+products:
+    new:
+        limit: {{theme_settings.homepage_new_products_count}}
+    featured:
+        limit: {{theme_settings.homepage_featured_products_count}}
+    top_sellers:
+        limit: {{theme_settings.homepage_top_products_count}}
 category:
+    shop_by_price: true
     products:
-        limit: {{theme_settings.categorypage_products_per_page}}
+        new:
+            limit: {{theme_settings.categorypage_products_per_page}}
+        limit: 50
+blog:
+    recent_posts:
+        limit: {{theme_settings.homepage_blog_posts_count}}
 ---
 {{inject "categoryProductsPerPage" theme_settings.categorypage_products_per_page}}
 {{#partial "head"}}
@@ -29,28 +42,23 @@ category:
     {{{region name="category_below_header"}}}
 {{/unless}}
 {{{category.description}}}
-<div class="page">
-    {{#if category.faceted_search_enabled}}
-        <aside class="page-sidebar" id="faceted-search-container">
-            {{> components/category/sidebar}}
-        </aside>
-    {{else if category.subcategories}}
-        <aside class="page-sidebar" id="faceted-search-container">
-            {{> components/category/sidebar}}
-        </aside>
-    {{else if theme_settings.shop_by_price_visibility}}
-        <aside class="page-sidebar" id="faceted-search-container">
-            {{> components/category/sidebar}}
-        </aside>
-    {{/if}}
-
+<div class="page" style="display:flex;margin:0;" category_container>
     <main class="page-content" id="product-listing-container">
         {{> components/category/product-listing}}
     </main>
-
-    <div class="page-region">
-        {{{region name="category_below_content"}}}
-    </div>
+    {{#if category.faceted_search_enabled}}
+        <aside class="page-sidebar" id="faceted-search-container" category_mac>
+            {{> components/category/sidebar}}
+        </aside>
+    {{else if category.subcategories}}
+        <aside class="page-sidebar" id="faceted-search-container" category_mac>
+            {{> components/category/sidebar}}
+        </aside>
+    {{else if theme_settings.shop_by_price_visibility}}
+        <aside class="page-sidebar" id="faceted-search-container" category_mac>
+            {{> components/category/sidebar}}
+        </aside>
+    {{/if}}
 </div>
 
 {{/partial}}

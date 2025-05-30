@@ -1,23 +1,42 @@
 {{#partial "page"}}
-
+{{!--
 {{> components/common/breadcrumbs breadcrumbs=breadcrumbs}}
-
+--}}
 <main class="page">
-    {{#unless theme_settings.hide_contact_us_page_heading }}
-        <h1 class="page-heading">{{page.title}}</h1>
-    {{/unless}}
+        {{#if page.title '==' 'Contact'}}
+        <div class="container-banner-contact-us">
+            <img data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/robustos-launching-soon-bg.png?t=1734023083"
+                src="{{cdn 'img/loading.svg'}}" 
+                alt="Contact Us Banner"
+                class="lazyload contact-us-banner">
+            <div class="container-blurbs-contact">
+                <h1 class="contact-us-title">Shop and Warehouse</h1>
+                <span class="contact_desc">We're happy to answer questions or help you with returns.
+                    Please fill out the form below if you need assistance.</span>
+               {{!--<span class="contact-tele">248-499-4700</span> --}}
+                <span class="contact-addr">25025 Dei St. Madison Heights, MI 48071</span>
+                <span class="contact-av">M-F, 9am-5pm</span>
 
-    {{#if page.sub_pages}}
-        <nav class="navBar navBar--sub">
-            <ul class="navBar-section account-navigation">
-                {{#each page.sub_pages}}
-                    <li class="navBar-item"><a class="navBar-action" href="{{url}}">{{title}}</a></li>
-                {{/each}}
-            </ul>
-        </nav>
-    {{/if}}
 
-    <div id="contact-us-page" class="page-content page-content--centered">
+            </div>
+        </div>
+        {{else}}
+        {{#unless theme_settings.hide_contact_us_page_heading }}
+            <h1 class="page-heading">{{page.title}}</h1>
+        {{/unless}}
+        
+        {{#if page.sub_pages}}
+            <nav class="navBar navBar--sub">
+                <ul class="navBar-section account-navigation">
+                    {{#each page.sub_pages}}
+                        <li class="navBar-item"><a class="navBar-action" href="{{url}}">{{title}}</a></li>
+                    {{/each}}
+                </ul>
+            </nav>
+        {{/if}}
+       
+     {{/if}}
+    <div id="contact-us-page-custom" class="page-content page-content--centered">
         {{#if forms.contact.success}}
             <div id="contact-us-success">{{{lang 'forms.contact_us.successful' shopPath=urls.home}}}</div>
         {{else}}

@@ -43,13 +43,75 @@
                 {{#if product.main_image}}
                 data-zoom-image="{{getImageSrcset product.main_image (cdn theme_settings.default_image_product) 1x=theme_settings.zoom_size }}"
                 {{/if}}
-                >
+                >   
             <div class="productView-img-container">
+ 
                 {{!-- Remove the surrounding a-element if there is no main image. --}}
                 {{#if product.main_image}}
                     <a href="{{getImageSrcset product.main_image (cdn theme_settings.default_image_product) 1x=theme_settings.zoom_size}}"
                         target="_blank">
                 {{/if}}
+                <div class="container-product-crown">
+                    {{#each products.new}}
+                            {{#if id '==' ../product.id}}
+                                <!-- <span class="badge badge--new">NEW</span> -->
+                                <div class="container-crown">
+                                    <svg>
+                                        <use xlink:href="#icon-crown-silver"></use>
+                                    </svg>
+                                    <span class="crown-label crown-label-{{value}}">NEW</span>
+                                </div>
+                            {{/if}}
+                    {{/each}}
+                    {{#each products.top_sellers}}
+                            {{#if id '==' ../product.id}}
+                                <!-- <span class="badge badge--top-gift">TOP GIFT</span> -->
+                            {{/if}}
+                    {{/each}}
+                    {{#each products.featured}}
+                            {{#if id '==' ../product.id}}
+                                <!-- <span class="badge badge--best-seller">BEST SELLER</span> -->
+                                <div class="container-crown">
+                                    <svg>
+                                        <use xlink:href="#icon-crown-gold"></use>
+                                    </svg>
+                                    <span class="crown-label crown-label-{{value}}">BEST</span>
+                                </div>
+                            {{/if}}
+                    {{/each}}
+                        {{#each product.custom_fields}}
+                            {{#if name '==' 'Badge'}}
+                                <!-- <span class="badge badge--{{lowercase (dashcase value)}}">{{value}}</span> -->
+                                {{#if value '==' 'SALE'}}
+                                    <div class="container-crown">
+                                        <svg>
+                                            <use xlink:href="#icon-crown-red"></use>
+                                        </svg>
+                                        <span class="crown-label crown-label-{{value}}">SALE</span>
+                                    </div>
+                                {{/if}}
+                                {{#if value '==' 'RARE'}}
+                                    <!-- <div class="container-crown">
+                                        <svg>
+                                            <use xlink:href="#icon-crown-gold"></use>
+                                        </svg>
+                                        <span class="crown-label crown-label-{{value}}">RARE</span>
+                                    </div> -->
+                                {{/if}}
+                            {{/if}}
+                        {{/each}}
+                </div>
+                <div class="container-cigar-rating">
+                    {{#each product.custom_fields}}
+                        {{#if name '==' 'Rating'}}
+                            <span class="cigar-rating">{{value}}</span>
+                        {{/if}}
+                        {{#if name '==' 'Rating By'}}
+                            <span class="rating-by">{{value}}</span>
+                            <div class="circle-border"></div>
+                        {{/if}}
+                    {{/each}}
+                </div>
                 {{> components/common/responsive-img
                     image=product.main_image
                     class="productView-image--default"
@@ -96,11 +158,13 @@
     <section class="productView-details product-data">
         <div class="productView-product">
             <h1 class="productView-title">{{product.title}}</h1>
+            {{!--
             {{#if product.brand}}
                 <h2 class="productView-brand">
                     <a href="{{product.brand.url}}"><span>{{product.brand.name}}</span></a>
                 </h2>
             {{/if}}
+            --}}
             {{#if product.call_for_price}}
                 <p class="productView-price">
                     <span>{{product.call_for_price}}</span>
@@ -138,7 +202,15 @@
                     {{/unless}}
                 {{/if}}
             </div>
+
+            {{!--
+            {{#if product.description}}
+                <span class="product-description-custom">{{{ product.description }}}</span>
+            {{/if}}
+            --}}
+                
             {{product.detail_messages}}
+            {{!--
             <dl class="productView-info">
                 <dt class="productView-info-name sku-label"{{#unless product.sku}} style="display: none;"{{/unless}}>{{lang 'products.sku'}}</dt>
                 <dd class="productView-info-value" data-product-sku>{{product.sku}}</dd>
@@ -222,6 +294,7 @@
                     {{> components/products/custom-fields }}
                 {{/if}}
             </dl>
+            --}}
         </div>
     </section>
 
@@ -240,7 +313,11 @@
                 <div data-product-option-change style="display:none;">
                     {{inject 'showSwatchNames' theme_settings.show_product_swatch_names}}
                     {{#each product.options}}
+                        {{#if partial '===' 'set-rectangle'}}
+                            {{>components/products/options/set-rectangle gql=../gql}}
+                        {{else}}
                         {{{dynamicComponent 'components/products/options'}}}
+                        {{/if}}
                     {{/each}}
                 </div>
                 <div class="form-field form-field--stock{{#unless product.stock_level}} u-hiddenVisually{{/unless}}">
@@ -262,7 +339,9 @@
                 {{> components/common/wishlist-dropdown}}
             {{/if}}
         </div>
+        {{!--
         {{> components/common/share url=product.url}}
+        --}}
     </section>
 
     <article class="productView-description">
@@ -274,8 +353,10 @@
     </article>
 </div>
 
+
 <div id="previewModal" class="modal modal--large" data-reveal>
     {{> components/common/modal/modal-close-btn }}
     <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-header-title"></div>
     <div class="loadingOverlay"></div>
 </div>
+

@@ -4,7 +4,9 @@
     </div>
     <ul class="navPages-list{{#if theme_settings.navigation_design '!==' 'simple'}} navPages-list-depth-max{{/if}}">
         {{#each categories}}
-            <li class="navPages-item">
+           {{#or (if name '==' 'Gift Pack') (if name '==' 'Gift Cards')}}
+           {{else}}
+            <li class="navPages-item" {{#if children}}_parentcateg{{/if}}>
             {{#if ../theme_settings.navigation_design '===' 'simple'}}
                 {{> components/common/navigation-list}}
             {{/if}}
@@ -12,18 +14,48 @@
                 {{> components/common/navigation-list-alternate}}
             {{/if}}
             </li>
+            {{/or}}
         {{/each}}
         {{#unless theme_settings.hide_content_navigation}}
             {{#each pages}}
+                {{!--note this condition 'or' is to not include the navigation (its PAGES) --}}
+                {{#or (if name '==' 'Blog') (if name '==' 'Contact') (if name '==' 'Privacy Policy') (if name '==' 'Terms & Conditions') (if name '==' 'Return and Refund Policy') (if name '==' 'Shipping Policy')}}
+                {{else}}
                  <li class="navPages-item navPages-item-page">
                      <a class="navPages-action{{#if name '==' ../page.title}} activePage{{/if}}"
-                        href="{{url}}"
+                        href="{{#or (if name '==' 'Gift Cards')}}/giftcertificates.php{{else}}{{url}}{{/or}}"
                         aria-label="{{name}}"
                      >
                          {{name}}
                      </a>
                  </li>
+                 {{/or}}
              {{/each}}
+
+            <li class="navPages-item navPages-item-page">
+                <a class="navPages-action"
+                   href="/contact"
+                   aria-label="Contact"
+                >
+                    CONTACT
+                </a>
+            </li>
+            <li class="navPages-item navPages-item-page">
+                <a class="navPages-action"
+                   href="/account.php"
+                   aria-label="My Account"
+                >
+                    MY ACCOUNT
+                </a>
+            </li>
+            <li class="navPages-item navPages-item-page">
+                <span class="navPages-action" search_trigger
+                >
+                    <svg id="header-search">
+                        <use xlink:href="#icon-search"></use>
+                    </svg>
+            </span>
+            </li>
         {{/unless}}
     </ul>
     <ul class="navPages-list navPages-list--user">
@@ -220,4 +252,17 @@
             </li>
         {{/if}}
     </ul>
+    <div class="con-in-nav-search">
+        <form class="form" action="/search.php">
+            <input type="text" class="custom-search-nav" placeholder="Search Cigars &amp; Cigar Accessories" id="search" name="search_query">
+          
+                <button class="custom-submit-nav" type="submit" value="Search">
+                <svg>
+                    <use xlink:href="#icon-search"></use>
+                </svg>
+                </button>
+                <span class="button-x-navigation">x</span>
+        </form>
+
+    </div>
 </nav>

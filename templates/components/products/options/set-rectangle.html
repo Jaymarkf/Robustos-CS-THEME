@@ -34,7 +34,9 @@
             {{/if}}
             {{#if ../required}}required{{/if}}
         >
-        <label class="form-option" for="attribute_rectangle__{{../id}}_{{id}}" data-product-attribute-value="{{id}}">
+        <label 
+        gql_hover="{{#each ../gql.data.site.product.variants.edges}}{{#each node.productOptions.edges}}{{#each node.values.edges}}{{#if node.entityId '==' ../../../id}}{{../../node.defaultImage.url}}{{/if}}{{/each}}{{/each}}{{/each}}"
+        class="form-option" for="attribute_rectangle__{{../id}}_{{id}}" data-product-attribute-value="{{id}}">
             <span class="form-option-variant">{{this.label}}</span>
         </label>
     </div>

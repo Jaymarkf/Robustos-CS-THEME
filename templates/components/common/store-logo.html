@@ -1,18 +1,45 @@
 <a href="{{urls.home}}" class="header-logo__link" data-header-logo-link>
-    {{#if settings.store_logo.image}}
-        {{#if theme_settings.logo_size '===' 'original'}}
-        <img class="header-logo-image-unknown-size"
-             src="{{getImage settings.store_logo.image 'logo_size'}}"
-             alt="{{settings.store_logo.title}}"
-             title="{{settings.store_logo.title}}">
+        {{#if settings.store_logo.image}}
+        {{#if footer}}
+            {{#if theme_settings.logo_size '===' 'original'}}
+            <img class="header-logo-image-unknown-size"
+                src="{{getImage settings.store_logo.image 'productgallery_size'}}"
+                alt="{{settings.store_logo.title}}"
+                title="{{settings.store_logo.title}}">
+            {{else}}
+            <div class="header-logo-image-container">
+                <img class="header-logo-image header-logo-image-desktop"
+                    src="{{getImage settings.store_logo.image 'productgallery_size'}}"
+                    srcset="{{getImageSrcset1x2x settings.store_logo.image theme_settings.productgallery_size}}"
+                    alt="{{settings.store_logo.title}}"
+                    title="{{settings.store_logo.title}}">
+                <img class="header-logo-image header-logo-image-mobile lazyload"
+                    src="{{cdn 'img/loading.svg'}}"
+                    data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/logo-1-.png?t=1730300192"
+                    alt="robustos logo mobile mode"
+                >
+            </div>
+            {{/if}}
         {{else}}
-        <div class="header-logo-image-container">
-            <img class="header-logo-image"
-                 src="{{getImage settings.store_logo.image 'logo_size'}}"
-                 srcset="{{getImageSrcset1x2x settings.store_logo.image theme_settings.logo_size}}"
-                 alt="{{settings.store_logo.title}}"
-                 title="{{settings.store_logo.title}}">
-        </div>
+            {{#if theme_settings.logo_size '===' 'original'}}
+            <img class="header-logo-image-unknown-size"
+                src="{{getImage settings.store_logo.image 'logo_size'}}"
+                alt="{{settings.store_logo.title}}"
+                title="{{settings.store_logo.title}}">
+            {{else}}
+            <div class="header-logo-image-container">
+                <img class="header-logo-image header-logo-image-desktop"
+                    src="{{getImage settings.store_logo.image 'logo_size'}}"
+                    srcset="{{getImageSrcset1x2x settings.store_logo.image theme_settings.logo_size}}"
+                    alt="{{settings.store_logo.title}}"
+                    title="{{settings.store_logo.title}}">
+                <img class="header-logo-image header-logo-image-mobile lazyload"
+                    src="{{cdn 'img/loading.svg'}}"
+                    data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/logo-1-.png?t=1730300192"
+                    alt="robustos logo mobile mode"
+                >
+            </div>
+            {{/if}}
         {{/if}}
     {{else}}
     <span class="header-logo-text">{{settings.store_logo.title}}</span>

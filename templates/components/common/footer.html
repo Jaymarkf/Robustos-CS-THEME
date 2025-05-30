@@ -9,6 +9,55 @@
         {{/each}}
     </div>
 {{/if}}
+<div class="container-footer-forms">
+    <div class="bg-crown"></div>
+    <div class="container-footer-logo">
+       {{> components/common/store-logo footer=true}}
+    </div>
+    <div class="container-main-logo-newsletter"> 
+        <div class="container-news-letter-custom">
+            <div id="mc_embed_shell">
+                <link href="//cdn-images.mailchimp.com/embedcode/classic-061523.css" rel="stylesheet" type="text/css">
+            <style type="text/css">
+                  #mc_embed_signup{background:transparent; false;clear:left; font:14px Helvetica,Arial,sans-serif; width:100%; max-width: 480px;}
+                  /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+                     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+          #mc_embed_signup .mc-field-group{
+          width:100%;
+          }
+          </style>
+          <div id="mc_embed_signup">
+              <form action="https://robustos.us20.list-manage.com/subscribe/post?u=fb7e195a9e68e4474926f6e23&amp;id=1dcfe59d0b&amp;f_id=00ed1ce0f0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+                  <div id="mc_embed_signup_scroll"><h2 style="font-size: 29px;
+              color: #231f20;
+              font-family: 'Oswald',sans-serif;
+              font-weight: bold;
+              padding-bottom: 10px;text-align:center;">Join Our Mailing List</h2>
+              <span style="font-family: 'Open Sans',sans-serif;
+              font-size: 18px;
+              color: #231f20;
+              max-width: 480px;
+              display: block;
+              text-align: center;
+              margin-left: auto;
+              margin-right: auto;
+              padding-bottom: 20px;">Be the first to discover new and limited cigars, accessories, and exclusive offers as they become available.</span>
+                      <div class="mc-field-group"><input type="text" name="FNAME" class="required text" id="mce-FNAME" required="" value="" placeholder="First Name"></div><div class="mc-field-group"><input type="text" name="LNAME" class="required text" id="mce-LNAME" required="" value="" placeholder="Last Name"></div><div class="mc-field-group"><input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="" value="" placeholder="Email"></div><div class="mc-field-group"><input type="text" name="PHONE" class="REQ_CSS" id="mce-PHONE" value="" placeholder="Phone number"></div>
+                  <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display: none;"></div>
+                      <div class="response" id="mce-success-response" style="display: none;"></div>
+                  </div><div aria-hidden="true" style="position: absolute; left: -5000px;"><input type="text" name="b_fb7e195a9e68e4474926f6e23_1dcfe59d0b" tabindex="-1" value=""></div><div class="clear"><svg>
+                    <use xlink:href="#icon-chevron-right-circle"></use>
+                </svg><input type="submit" name="subscribe" id="mc-embedded-subscribe" class="button submit-newsletter-custom" value="Subscribe" style="width:100%;background-color:#b1221a;"></div>
+              </div>
+          </form>
+          </div>
+          <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[0]='EMAIL';ftypes[0]='email';fnames[4]='PHONE';ftypes[4]='phone';fnames[3]='ADDRESS';ftypes[3]='address';fnames[5]='BIRTHDAY';ftypes[5]='birthday';fnames[6]='COMPANY';ftypes[6]='text';}(jQuery));var $mcj = jQuery.noConflict(true);</script></div>
+          
+        </div>
+    </div>
+  
+</div>
 <footer class="footer" role="contentinfo">
     <h2 class="footer-title-sr-only">{{lang 'footer.title'}}</h2>
     <div class="container">
@@ -23,19 +72,26 @@
         {{/if}}
         <section class="footer-info">
             <article class="footer-info-col footer-info-col--small" data-section-type="footer-webPages">
-                <h3 class="footer-info-heading">{{lang 'footer.navigate'}}</h3>
+                <h3 class="footer-info-heading">POPULAR BRANDS</h3>
                 <ul class="footer-info-list">
-                    {{#each pages}}
                         <li>
-                            <a href="{{url}}">{{name}}</a>
+                            <a href="/davidoff/">Davidoff</a>
                         </li>
-                    {{/each}}
+                        <li>
+                            <a href="/rocky-patel/">Rocky Patel</a>
+                        </li>
+                        <li>
+                            <a href="/padron/">Padron</a>
+                        </li>
+                        <li>
+                            <a href="/brands">View All</a>
+                        </li>
+
                     <li>
                         <a href="{{urls.sitemap}}">{{lang 'sitemap.page_title'}}</a>
                     </li>
                 </ul>
             </article>
-
             <article class="footer-info-col footer-info-col--small" data-section-type="footer-categories">
                 <h3 class="footer-info-heading">{{lang 'footer.categories'}}</h3>
                 <ul class="footer-info-list">
@@ -44,50 +100,97 @@
                             <a href="{{url}}">{{name}}</a>
                         </li>
                     {{/each}}
+                    <li>
+                        <a href="/categories">Shop All</a>
+                    </li>
                 </ul>
             </article>
-
-            {{#and theme_settings.shop_by_brand_show_footer shop_by_brand.length}}
             <article class="footer-info-col footer-info-col--small" data-section-type="footer-brands">
-                <h3 class="footer-info-heading">{{lang 'footer.brands'}}</h3>
+                <h3 class="footer-info-heading">ACCOUNT</h3>
                 <ul class="footer-info-list">
-                    {{#each shop_by_brand}}
                         <li>
-                            <a href="{{url}}">{{name}}</a>
+                            <a href="/login.php">Login</a>
                         </li>
-                    {{/each}}
-                    <li><a href="{{urls.brands}}">{{lang 'common.view_all'}}</a></li>
+                        <li>
+                            <a href="/giftcertificates.php">Gift Cards</a>
+                        </li>
+                        <li>
+                            <a href="/wishlist.php">Wishlist</a>
+                        </li>
                 </ul>
             </article>
-            {{/and}}
 
-            {{#if settings.address}}
-            <article class="footer-info-col footer-info-col--small" data-section-type="storeInfo">
-                <h3 class="footer-info-heading">{{lang 'footer.info'}}</h3>
-                <address>{{nl2br settings.address}}</address>
-                {{#if settings.phone_number}}
-                    <strong>{{lang 'footer.call_us' phone_number=settings.phone_number}}</strong>
-                {{/if}}
+            <article class="footer-info-col footer-info-col--small" data-section-type="footer-brands">
+                <h3 class="footer-info-heading">ABOUT</h3>
+                <ul class="footer-info-list">
+                        <li>
+                            <a href="#">Our Story</a>
+                        </li>
+                        <!--<li>-->
+                        <!--    <a href="#">Blog</a>-->
+                        <!--</li>-->
+                        <li>
+                            <a href="/privacy-policy/">Privacy Policy</a>
+                        </li>
+                        <li>
+                            <a href="/terms-conditions">Terms & Conditions</a>
+                        </li>
+                        <li>
+                            <a href="/shipping-policy">Shipping Policy</a>
+                        </li>
+                        <li>
+                            <a href="/return-and-refund-policy">Return and Refund Policy</a>
+                        </li>
+                        <li>
+                            <a href="/contact">Contact Us</a>
+                        </li>
+                </ul>
             </article>
-            {{/if}}
-
+      
+            
             <article class="footer-info-col" data-section-type="newsletterSubscription">
+                {{!--
                 {{#if settings.show_newsletter_box}}
                     {{> components/common/subscription-form}}
                 {{/if}}
+                --}}
+                {{!--
                 {{> components/common/payment-icons}}
+                --}}
+                <div class="image-block">
+                    <a href="/cigars/davidoff">
+                        <img src="{{cdn 'img/loading.svg'}}" data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/dav-gbawards-lock-up-2021-cmyk-1.png?t=1724157321" alt="davidoff footer image" class="footer-image-logo img-1-f lazyload">
+                    </a>
+                </div>
+                <div class="image-block">
+                  
+                        <img src="{{cdn 'img/loading.svg'}}" data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/cra-logo-1.png?t=1724157341" alt="davidoff footer image" class="footer-image-logo img-2-f lazyload">
+                   
+                </div>
+                <div class="image-block">
+                    <a href="/cigars/taa">
+                        <img src="{{cdn 'img/loading.svg'}}" data-src="https://cdn11.bigcommerce.com/s-o35pe68clg/images/stencil/original/image-manager/taa-logo-v2.png?t=1734022093" alt="davidoff footer image" class="footer-image-logo img-3-f lazyload">
+                    </a>
+                </div>
             </article>
+           
         </section>
-        {{#if theme_settings.show_powered_by}}
-            <div class="footer-copyright">
-                <p class="powered-by">{{lang 'footer.powered_by'}} <a href="https://www.bigcommerce.com?utm_source=merchant&amp;utm_medium=poweredbyBC" rel="nofollow">BigCommerce</a></p>
-            </div>
-        {{/if}}
-        {{#if theme_settings.show_copyright_footer}}
-            <div class="footer-copyright">
-                <p class="powered-by">&copy; {{moment format="YYYY"}} {{settings.store_name}} </p>
-            </div>
-        {{/if}}
+    </div>
+  
+    <div class="container-footer-short-blurb">
+       <span class="footer-short-blurb">
+        Robusto’s Cigar Superstore and More | The Best Award Winning Online Cigar Store<br>
+        We offer a curated selection of the finest luxury and <a href="/cigars/rare-cigars">rare cigar</a> brands, including <a href="/cigars/davidoff/">Davidoff</a>, <a href="/cigars/padron-2/">Padron</a>, <a href="/cigars/arturo-fuente/">Arturo Fuente</a>, <a href="/cigars/fuente-fuente-opus-x/">Fuente Opus X</a>, <a href="/cigars/alfonso/">Alfonso</a>, <a href="/cigars/byron/">Byron</a>, <a href="/cigars/atabey/">Atabey</a> Cigars.<br>
+        In addition, our shop stocks an impressive array of premium cigar <a href="/accessories">accessories</a> from renowned names like <a href="/accessories/elie-bleu/">Elie Bleu</a>, <a href="/accessories/st-dupont/">S.T. Dupont</a>, <a href="/accessories/prometheus/">Prometheus</a>, <a href="/accessories/the-opus-x-society/">The Opus X Society</a>. Searching for the perfect cigar gift? Discover our collection of <a href="/accessories/humidors/">Humidors</a>, <a href="/accessories/ashtrays/">Luxury Ashtrays</a>, <a href="/accessories/cases/">Cigar Cases</a>, <a href="/accessories/lighters/">Lighters</a>, and <a href="/accessories/cutters/">Cutters</a>. If you're looking to buy the best rare cigars online, you’ll find them right here.
+       </span>
     </div>
     {{{region name="ssl_site_seal--global"}}}
+    
+    {{#if theme_settings.show_copyright_footer}}
+    <div class="footer-copyright">
+        <p class="powered-by" style="color:#666666;text-transform: inherit;font-size:12px;">&copy; {{moment format="YYYY"}} {{settings.store_name}} </p>
+    </div>
+    {{/if}}
 </footer>
+
+

@@ -27,6 +27,71 @@
     {{/or}}"
 >
     <figure class="card-figure">
+        <div class="container-crown-badge">
+            {{#each new}}
+                    {{#if id '==' ../id}}
+                        <!-- <span class="badge badge-new">NEW</span> -->
+                        <div class="container-crown-cards">
+                            <svg>
+                                <use xlink:href="#icon-crown-silver"></use>
+                            </svg>
+                            <span class="crown-cards-label crown-cards-label-new">NEW</span>
+                        </div>
+                    {{/if}}
+            {{/each}}
+            {{#each top_sellers}}
+                    {{#if id '==' ../id}}
+                        <!-- <span class="badge badge-top-gift">TOP GIFT</span> --> 
+                    {{/if}}
+            {{/each}}
+            {{#each best_seller}}
+                    {{#if id '==' ../id}}
+                        <!-- <span class="badge badge-best-seller">BEST</span> -->
+                        <div class="container-crown-cards">
+                            <svg>
+                                <use xlink:href="#icon-crown-gold"></use>
+                            </svg>
+                            <span class="crown-cards-label crown-cards-label-best">BEST</span>
+                        </div>
+                    {{/if}}
+            {{/each}}
+            {{#each custom_fields}}
+                {{#if (lowercase (dashcase name) '==' 'badge')}}
+                    {{#if (lowercase (dashcase value)) '==' 'sale'}}
+                        <!-- <span class="badge badge-sale">SALE</span> -->
+                        <div class="container-crown-cards">
+                            <svg>
+                                <use xlink:href="#icon-crown-red"></use>
+                            </svg>
+                            <span class="crown-cards-label crown-cards-label-sale">SALE</span>
+                        </div>
+                    {{/if}}
+                    {{#if (lowercase (dashcase value)) '==' 'rare'}}
+                        <!-- <span class="badge badge-rare">RARE</span> -->
+                    {{/if}}
+                    {{#if (lowercase (dashcase value)) '==' 'limited-edition'}}
+                        <!-- <span class="badge badge-limited-edition">LIMITED EDITION</span> -->
+                    {{/if}}
+                {{/if}}
+            {{/each}}
+        </div>
+        <div class="container-cigars-count">
+            <span class="cigars-count">
+                {{#each custom_fields}}
+                    {{#if name '==' 'Rating'}}
+                        {{value}}
+                    {{/if}}
+                {{/each}}
+            </span>
+            <span class="cigars-brand">
+                {{#each custom_fields}}
+                {{#if name '==' 'Rating By'}}
+                    {{value}}
+                {{/if}}
+            {{/each}}
+            </span>
+        </div>
+
         {{#if stock_level '===' 0}}
             {{#if theme_settings.pdp_sold_out_label '===' ''}}
                 {{> components/products/product-badge
@@ -72,6 +137,14 @@
                     lazyload=theme_settings.lazyload_mode
                     default_image=theme_settings.default_image_product
                 }}
+                {{!-- INSERTED 07-11-2024 -- for sliding product thumbnail cards purposes --}}
+                {{#each images}}
+                            {{#if @index '==' 0}}
+                            {{else}}
+                                <img src="{{getImage this 'productgallery_size'}}" alt="image {{@index}}" class="card-image" />
+                            {{/if}}
+                {{/each}}
+                {{!-- END OF SLIDER TRANSITION --}}
             </div>
         </a>
 
