@@ -461,5 +461,209 @@
             }
             });
         </script>
+        {{#if template_file '==' 'pages/product'}}
+        <script>
+                 document.querySelector('.bn').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const productForm = document.querySelector('form[action="/cart.php"]');
+        if (!productForm) return;
+
+        if (!productForm.checkValidity()) {
+            productForm.reportValidity();
+            return;
+        }
+
+        // Show loading popup
+        const overlay = document.getElementById('custom-loading-overlay');
+        overlay.style.display = 'flex';
+
+        // Build query string from form data
+        const formData = new FormData(productForm);
+        const params = new URLSearchParams();
+
+        params.append('action', 'add');
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+        }
+
+        // Redirect via GET — browser reloads page, popup visible until unload
+        window.location.href = '/cart.php?' + params.toString();
+        });
+        </script>
+        {{/if}}
+        
     </body>
+
+    <!-- for buy now html element and css -->
+    <div id="custom-loading-overlay" style="display:none;">
+    <div class="custom-loading-popup">
+        <div class="custom-spinner"></div>
+        <div class="custom-loading-text">Redirecting to cart page</div>
+    </div>
+    </div>
+    <style>
+    #custom-loading-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .custom-loading-popup {
+        background: #fff;
+        padding: 30px 45px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        color: #222;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        min-width: 320px;s
+        }
+
+        .custom-spinner {
+        width: 48px;
+        height: 48px;
+        border: 6px solid #ddd;
+        border-top-color: var(--Red); /* Dodger Blue */
+        border-radius: 50%;
+        animation: custom-spin 1s linear infinite;
+        }
+
+        @keyframes custom-spin {
+        to {
+            transform: rotate(360deg);
+        }
+        }
+
+    </style>
+    <!-- END -->
+
+    <!-- DROP DOWN for category cards-->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.container-add-to-cart form.add-to-cart-form').forEach(form => {
+    const container = form.querySelector('.container-select-boxes');
+    if (!container) return;
+
+    const mainToggle = container.querySelector('.main-toggle');
+    const subDropdowns = container.querySelector('.sub-dropdowns');
+    const dropdownWrappers = container.querySelectorAll('.dropdown-wrapper');
+
+    // Toggle sub-dropdowns visibility on main toggle click
+    mainToggle.addEventListener('click', e => {
+      e.stopPropagation();
+
+      subDropdowns.style.display = subDropdowns.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Dropdown wrappers behavior
+    dropdownWrappers.forEach(wrapper => {
+      const btn = wrapper.querySelector('.dropdown-button');
+      const menu = wrapper.querySelector('.dropdown-menu');
+      const hiddenInput = wrapper.querySelector('input[type="hidden"][name="selected_optionz"]');
+      const defaultText = btn.getAttribute('data-default');
+
+      // Toggle dropdown open/close
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        // Close other dropdowns
+        dropdownWrappers.forEach(w => {
+          if (w !== wrapper) w.classList.remove('open');
+        });
+        wrapper.classList.toggle('open');
+      });
+
+      // On selecting an item
+      menu.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', e => {
+          e.stopPropagation();
+          btn.textContent = item.textContent.trim();
+          wrapper.classList.remove('open');
+          // Set hidden input value to selected text
+          if (hiddenInput) hiddenInput.value = item.getAttribute('item-id');
+          updateMainButton();
+        });
+      });
+
+      // Initialize hidden input empty if button text is default
+      if (btn.textContent.trim() === defaultText && hiddenInput) {
+        hiddenInput.value = '';
+      }
+    });
+
+    // Update the main button text to show selections or default
+    function updateMainButton() {
+      const selectedTexts = [...dropdownWrappers].map(wrapper => {
+        const btn = wrapper.querySelector('.dropdown-button');
+        const defaultText = btn.getAttribute('data-default');
+        const text = btn.textContent.trim();
+        return text !== defaultText ? text : null;
+      }).filter(Boolean);
+
+      mainToggle.textContent = selectedTexts.length ? selectedTexts.join(' : ') : 'Select Options';
+      mainToggle.classList.remove('error');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+      dropdownWrappers.forEach(w => w.classList.remove('open'));
+      subDropdowns.style.display = 'none';
+    });
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
+  const hiddenInputs = form.querySelectorAll('input[type="hidden"][name="selected_optionz"]');
+  let allValid = true;
+
+  hiddenInputs.forEach(input => {
+    if (!input.value.trim()) {
+      allValid = false;
+      mainToggle.classList.add('error');
+    }
+  });
+
+  if (!allValid) {
+    const oldText = mainToggle.textContent;
+    mainToggle.textContent = 'Please select all options!';
+    setTimeout(() => {
+      updateMainButton();
+      mainToggle.classList.remove('error');
+    }, 2000);
+    return;
+  }
+
+  // All inputs valid
+  const selectedValues = [...hiddenInputs].map(input => input.value);
+  console.log('Selected Options:', selectedValues.join(' : '));
+
+  
+  // form.submit(); // Uncomment to actually submit
+  var baseUrl = form.querySelector('.custom-add-to-cart').getAttribute('cart-item-id');
+  var attributes = form.querySelector('[name="selected_optionz"]').getAttribute('parent-select');
+  var option_id = form.querySelector('[name="selected_optionz"]').value;
+
+  var final_url = baseUrl+ "&attribute["+ attributes + "]=" + option_id;
+  window.location.href = final_url;
+
+
+  
+});
+  });
+});
+</script>
+
+    <!-- END-->
+
+
 </html>

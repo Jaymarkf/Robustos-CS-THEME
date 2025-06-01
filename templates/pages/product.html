@@ -103,12 +103,12 @@ gql: "query Experiment($productId: Int!) {
 
     if (mainProductImage) {
         const mainProductImagePath = mainProductImage.src; // product main image src path
-        console.log(mainProductImagePath);
+   
 
         gql.forEach(function(data) {
             const gqlImgPath = data.getAttribute('gql_hover');
             data.addEventListener('mouseover', function() {
-                console.log(this);
+      
 
                 // Store the original attributes except for 'src'
                 if (mainProductImage) {

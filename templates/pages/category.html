@@ -15,7 +15,49 @@ category:
 blog:
     recent_posts:
         limit: {{theme_settings.homepage_blog_posts_count}}
+gql: "query Experiment($categoryId: Int!) {
+  site {
+    category(entityId: $categoryId) {
+      entityId
+      name
+      products(first: 50, sortBy: DEFAULT) {
+        edges {
+          node {
+            name
+            entityId
+            addToCartUrl
+            showCartAction
+            productOptions(first: 50) {
+              edges {
+                node {
+                  entityId
+                  displayName
+                  isRequired      
+                ... on CheckboxOption {
+                  checkedByDefault
+                }
+                ... on MultipleChoiceOption {
+                  values(first: 50) {
+                    edges {
+                      node {
+                        entityId
+                        label
+                        isDefault
+                      }
+                    }
+                  }
+                }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}"
 ---
+{{inject 'productId' product.id}}
 {{inject "categoryProductsPerPage" theme_settings.categorypage_products_per_page}}
 {{#partial "head"}}
     {{#if pagination.category.previous}}

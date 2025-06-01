@@ -4,7 +4,7 @@
     </div>
     <ul class="navPages-list{{#if theme_settings.navigation_design '!==' 'simple'}} navPages-list-depth-max{{/if}}">
         {{#each categories}}
-           {{#or (if name '==' 'Gift Pack') (if name '==' 'Gift Cards')}}
+           {{#or (if name '==' 'Gift Pack') (if name '==' 'Gift Cards') (if name '==' 'Foundation Charter Oak Habano')}}
            {{else}}
             <li class="navPages-item" {{#if children}}_parentcateg{{/if}}>
             {{#if ../theme_settings.navigation_design '===' 'simple'}}
@@ -19,7 +19,7 @@
         {{#unless theme_settings.hide_content_navigation}}
             {{#each pages}}
                 {{!--note this condition 'or' is to not include the navigation (its PAGES) --}}
-                {{#or (if name '==' 'Blog') (if name '==' 'Contact') (if name '==' 'Privacy Policy') (if name '==' 'Terms & Conditions') (if name '==' 'Return and Refund Policy') (if name '==' 'Shipping Policy')}}
+                {{#or (if name '==' 'Foundation Charter Oak Habano')(if name '==' 'Blog') (if name '==' 'Contact') (if name '==' 'Privacy Policy') (if name '==' 'Terms & Conditions') (if name '==' 'Return and Refund Policy') (if name '==' 'Shipping Policy')}}
                 {{else}}
                  <li class="navPages-item navPages-item-page">
                      <a class="navPages-action{{#if name '==' ../page.title}} activePage{{/if}}"

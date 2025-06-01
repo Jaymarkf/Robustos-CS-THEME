@@ -27,16 +27,24 @@
     {{/or}}"
 >
     <figure class="card-figure">
+        {{#if settings.show_wishlist}}
+                    <div class="container-wishlist-card">
+                        <form action="{{product.add_to_wishlist_url}}" class="form form-wishlist form-action" data-wishlist-add method="post">
+                            <a data-wishlist href="/wishlist.php?action=addwishlist&product_id={{id}}"><svg><use xlink:href="#icon-heart"></use></svg> <span>ADD TO WISHLIST</span></a>
+                        </form>
+                    </div>
+        {{/if}}
         <div class="container-crown-badge">
+      
             {{#each new}}
                     {{#if id '==' ../id}}
                         <!-- <span class="badge badge-new">NEW</span> -->
-                        <div class="container-crown-cards">
+                        <!-- <div class="container-crown-cards">
                             <svg>
                                 <use xlink:href="#icon-crown-silver"></use>
                             </svg>
                             <span class="crown-cards-label crown-cards-label-new">NEW</span>
-                        </div>
+                        </div> -->
                     {{/if}}
             {{/each}}
             {{#each top_sellers}}
@@ -71,6 +79,14 @@
                     {{/if}}
                     {{#if (lowercase (dashcase value)) '==' 'limited-edition'}}
                         <!-- <span class="badge badge-limited-edition">LIMITED EDITION</span> -->
+                    {{/if}}
+                    {{#if (lowercase (dashcase value)) '==' 'new'}}
+                    <div class="container-crown-cards">
+                            <svg>
+                                <use xlink:href="#icon-crown-silver"></use>
+                            </svg>
+                            <span class="crown-cards-label crown-cards-label-new">NEW</span>
+                        </div>
                     {{/if}}
                 {{/if}}
             {{/each}}
@@ -130,6 +146,7 @@
            data-event-type="product-click"
         >
             <div class="card-img-container">
+              
                 {{> components/common/responsive-img
                     image=image
                     class="card-image"
@@ -208,4 +225,36 @@
         {{{region name="product_item_below_price"}}}
         {{> components/products/bulk-discount-rates}}
     </div>
+    <div class="container-add-to-cart">
+          {{#if show_cart_action}}
+                {{#each gql.data.site.category.products.edges}}
+                    {{#if node.entityId '==' ../id}}
+                    <form  method="POST" class="add-to-cart-form">
+                        <div class="container-select-boxes">
+                        <div class="main-dropdown">
+                            <button class="dropdown-button main-toggle" type="button">Select Options</button>
+                        </div>
+                        <div class="sub-dropdowns" style="display:none;">
+                            {{#each node.productOptions.edges}}    
+                                {{#if node.isRequired}}
+                                <div class="dropdown-wrapper">
+                                    <button class="dropdown-button" type="button" data-default="Select Color" >Select {{node.displayName}}</button>
+                                    <input type="hidden" name="selected_optionz" parent-select="{{node.entityId}}" value="" required/>
+                                    <div class="dropdown-menu">
+                                        {{#each node.values.edges}}
+                                        <div class="dropdown-item" item-id="{{node.entityId}}">{{node.label}}</div>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                                {{/if}}
+                            {{/each}}
+                        </div>
+
+                        </div>
+                        <button class="custom-add-to-cart" type="submit" cart-item-id="{{node.addToCartUrl}}"><svg style="fill:black;width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>Add to Cart</button>
+                </form>
+                {{/if}}
+            {{/each}}
+        {{/if}}
+</div>
 </article>

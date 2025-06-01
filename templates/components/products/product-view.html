@@ -335,6 +335,7 @@
                     {{/if}}
                 {{/if}}
             </form>
+            <a href="" id="bn" class="bn">Buy Now</a>
             {{#if settings.show_wishlist}}
                 {{> components/common/wishlist-dropdown}}
             {{/if}}
@@ -343,7 +344,6 @@
         {{> components/common/share url=product.url}}
         --}}
     </section>
-
     <article class="productView-description">
         {{#if theme_settings.show_product_details_tabs}}
             {{> components/products/description-tabs}}
