@@ -27,26 +27,40 @@ gql: "query Experiment($categoryId: Int!) {
             entityId
             addToCartUrl
             showCartAction
+            variants {
+              edges {
+                node {
+                  entityId
+                  sku
+                  prices {
+                    price {
+                      value
+                      currencyCode
+                    }
+                  }
+                }
+              }
+            }
             productOptions(first: 50) {
               edges {
                 node {
                   entityId
                   displayName
-                  isRequired      
-                ... on CheckboxOption {
-                  checkedByDefault
-                }
-                ... on MultipleChoiceOption {
-                  values(first: 50) {
-                    edges {
-                      node {
-                        entityId
-                        label
-                        isDefault
+                  isRequired
+                  ... on CheckboxOption {
+                    checkedByDefault
+                  }
+                  ... on MultipleChoiceOption {
+                    values(first: 50) {
+                      edges {
+                        node {
+                          entityId
+                          label
+                          isDefault
+                        }
                       }
                     }
                   }
-                }
                 }
               }
             }
@@ -55,7 +69,8 @@ gql: "query Experiment($categoryId: Int!) {
       }
     }
   }
-}"
+}
+"
 ---
 {{inject 'productId' product.id}}
 {{inject "categoryProductsPerPage" theme_settings.categorypage_products_per_page}}

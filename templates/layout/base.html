@@ -547,121 +547,67 @@
 
     </style>
     <!-- END -->
+    <script>
+        document.addEventListener("DOMContentLoaded",function(){
+            document.querySelectorAll('.dropdown-button--j').forEach(button => {
+                button.addEventListener('click', function () {
+                const dropdown = this.closest('.dropdown--j');
+                const menu = dropdown.querySelector('.dropdown-menu--j');
+                const chevron = dropdown.querySelector('.chevron--j');
+                menu.classList.toggle('show--j');
+                chevron.classList.toggle('up--j');
+                });
+            });
 
+            document.querySelectorAll('.dropdown-menu--j div').forEach(option => {
+                option.addEventListener('click', function () {
+                    const dropdown = this.closest('.dropdown--j');
+                    const selectedText = dropdown.querySelector('.selected-text--j');
+                    const menu = dropdown.querySelector('.dropdown-menu--j');
+                    const chevron = dropdown.querySelector('.chevron--j');
+                    const parent = dropdown.closest('form');
+                    const hidden_input = parent.querySelector('input');
+
+                    const label = this.getAttribute('data-value');
+                    const price = this.querySelector('span')?.textContent?.trim() || '';
+
+                    // Set combined label + price
+                    selectedText.innerHTML = `${label} <span>${price}</span>`;
+
+                    hidden_input.setAttribute('name', this.getAttribute('option-entityid'));
+                    hidden_input.setAttribute('value', this.getAttribute('data-option-values'));
+
+                    menu.classList.remove('show--j');
+                    chevron.classList.remove('up--j');
+                });
+            });
+               document.querySelectorAll('.custom-add-to-cart').forEach(crt=>{
+                crt.addEventListener('click',function(b){
+                    const parent = crt.closest('form');
+                    const at = this.previousElementSibling;
+                    const query = at.getAttribute('name') + "=" + at.value;
+                    if (parent.reportValidity()) {
+                        b.preventDefault();
+                        const parentUrl = this.getAttribute('cart-urls');
+                        const cartUrl = parentUrl +"&"+ query;
+                        window.location.href = cartUrl;
+                    }
+
+                });
+               });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                document.querySelectorAll('.dropdown--j').forEach(dropdown => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.querySelector('.dropdown-menu--j').classList.remove('show--j');
+                    dropdown.querySelector('.chevron--j').classList.remove('up--j');
+                }
+                });
+            });
+        });
+    </script>
     <!-- DROP DOWN for category cards-->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.container-add-to-cart form.add-to-cart-form').forEach(form => {
-    const container = form.querySelector('.container-select-boxes');
-    if (!container) return;
 
-    const mainToggle = container.querySelector('.main-toggle');
-    const subDropdowns = container.querySelector('.sub-dropdowns');
-    const dropdownWrappers = container.querySelectorAll('.dropdown-wrapper');
-
-    // Toggle sub-dropdowns visibility on main toggle click
-    mainToggle.addEventListener('click', e => {
-      e.stopPropagation();
-
-      subDropdowns.style.display = subDropdowns.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Dropdown wrappers behavior
-    dropdownWrappers.forEach(wrapper => {
-      const btn = wrapper.querySelector('.dropdown-button');
-      const menu = wrapper.querySelector('.dropdown-menu');
-      const hiddenInput = wrapper.querySelector('input[type="hidden"][name="selected_optionz"]');
-      const defaultText = btn.getAttribute('data-default');
-
-      // Toggle dropdown open/close
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        // Close other dropdowns
-        dropdownWrappers.forEach(w => {
-          if (w !== wrapper) w.classList.remove('open');
-        });
-        wrapper.classList.toggle('open');
-      });
-
-      // On selecting an item
-      menu.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', e => {
-          e.stopPropagation();
-          btn.textContent = item.textContent.trim();
-          wrapper.classList.remove('open');
-          // Set hidden input value to selected text
-          if (hiddenInput) hiddenInput.value = item.getAttribute('item-id');
-          updateMainButton();
-        });
-      });
-
-      // Initialize hidden input empty if button text is default
-      if (btn.textContent.trim() === defaultText && hiddenInput) {
-        hiddenInput.value = '';
-      }
-    });
-
-    // Update the main button text to show selections or default
-    function updateMainButton() {
-      const selectedTexts = [...dropdownWrappers].map(wrapper => {
-        const btn = wrapper.querySelector('.dropdown-button');
-        const defaultText = btn.getAttribute('data-default');
-        const text = btn.textContent.trim();
-        return text !== defaultText ? text : null;
-      }).filter(Boolean);
-
-      mainToggle.textContent = selectedTexts.length ? selectedTexts.join(' : ') : 'Select Options';
-      mainToggle.classList.remove('error');
-    }
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', () => {
-      dropdownWrappers.forEach(w => w.classList.remove('open'));
-      subDropdowns.style.display = 'none';
-    });
-
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  const hiddenInputs = form.querySelectorAll('input[type="hidden"][name="selected_optionz"]');
-  let allValid = true;
-
-  hiddenInputs.forEach(input => {
-    if (!input.value.trim()) {
-      allValid = false;
-      mainToggle.classList.add('error');
-    }
-  });
-
-  if (!allValid) {
-    const oldText = mainToggle.textContent;
-    mainToggle.textContent = 'Please select all options!';
-    setTimeout(() => {
-      updateMainButton();
-      mainToggle.classList.remove('error');
-    }, 2000);
-    return;
-  }
-
-  // All inputs valid
-  const selectedValues = [...hiddenInputs].map(input => input.value);
-  console.log('Selected Options:', selectedValues.join(' : '));
-
-  
-  // form.submit(); // Uncomment to actually submit
-  var baseUrl = form.querySelector('.custom-add-to-cart').getAttribute('cart-item-id');
-  var attributes = form.querySelector('[name="selected_optionz"]').getAttribute('parent-select');
-  var option_id = form.querySelector('[name="selected_optionz"]').value;
-
-  var final_url = baseUrl+ "&attribute["+ attributes + "]=" + option_id;
-  window.location.href = final_url;
-
-
-  
-});
-  });
-});
-</script>
 
     <!-- END-->
 
