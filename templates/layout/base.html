@@ -547,69 +547,6 @@
 
     </style>
     <!-- END -->
-    <script>
-        document.addEventListener("DOMContentLoaded",function(){
-            document.querySelectorAll('.dropdown-button--j').forEach(button => {
-                button.addEventListener('click', function () {
-                const dropdown = this.closest('.dropdown--j');
-                const menu = dropdown.querySelector('.dropdown-menu--j');
-                const chevron = dropdown.querySelector('.chevron--j');
-                menu.classList.toggle('show--j');
-                chevron.classList.toggle('up--j');
-                });
-            });
-
-            document.querySelectorAll('.dropdown-menu--j div').forEach(option => {
-                option.addEventListener('click', function () {
-                    const dropdown = this.closest('.dropdown--j');
-                    const selectedText = dropdown.querySelector('.selected-text--j');
-                    const menu = dropdown.querySelector('.dropdown-menu--j');
-                    const chevron = dropdown.querySelector('.chevron--j');
-                    const parent = dropdown.closest('form');
-                    const hidden_input = parent.querySelector('input');
-
-                    const label = this.getAttribute('data-value');
-                    const price = this.querySelector('span')?.textContent?.trim() || '';
-
-                    // Set combined label + price
-                    selectedText.innerHTML = `${label} <span>${price}</span>`;
-
-                    hidden_input.setAttribute('name', this.getAttribute('option-entityid'));
-                    hidden_input.setAttribute('value', this.getAttribute('data-option-values'));
-
-                    menu.classList.remove('show--j');
-                    chevron.classList.remove('up--j');
-                });
-            });
-               document.querySelectorAll('.custom-add-to-cart').forEach(crt=>{
-                crt.addEventListener('click',function(b){
-                    const parent = crt.closest('form');
-                    const at = this.previousElementSibling;
-                    const query = at.getAttribute('name') + "=" + at.value;
-                    if (parent.reportValidity()) {
-                        b.preventDefault();
-                        const parentUrl = this.getAttribute('cart-urls');
-                        const cartUrl = parentUrl +"&"+ query;
-                        window.location.href = cartUrl;
-                    }
-
-                });
-               });
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function (e) {
-                document.querySelectorAll('.dropdown--j').forEach(dropdown => {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.querySelector('.dropdown-menu--j').classList.remove('show--j');
-                    dropdown.querySelector('.chevron--j').classList.remove('up--j');
-                }
-                });
-            });
-        });
-    </script>
-    <!-- DROP DOWN for category cards-->
-
-
-    <!-- END-->
 
 
 </html>

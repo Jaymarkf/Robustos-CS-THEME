@@ -11,7 +11,7 @@
         {{/if}}
     </div>
 
-    {{> components/common/paginator pagination.category}}
+    {{> components/common/paginator pagination.category reload=true}}
 {{else}}
     {{#if category.search_error}}
         <p>{{lang 'search.errorMessage'}}</p>

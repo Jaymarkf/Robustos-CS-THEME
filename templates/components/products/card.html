@@ -225,33 +225,5 @@
         {{{region name="product_item_below_price"}}}
         {{> components/products/bulk-discount-rates}}
     </div>
-    <div class="container-add-to-cart">
-          {{#if show_cart_action}}
-                {{#each gql.data.site.category.products.edges}}
-                    {{#if node.entityId '==' ../id}}
-                       {{#lt node.productOptions.edges.length 2}}
-                       <form class="form-custom-option" method="GET">
-                            <div class="container-custom-options">
-                                <div class="dropdown--j">
-                                <div class="dropdown-button--j">
-                                    <span class="selected-text--j">Select {{#each node.productOptions.edges}}{{node.displayName}}{{/each}}</span>
-                                    <i class="chevron--j"></i>
-                                </div>
-                                <div class="dropdown-menu--j">
-                                    {{#forEach node.productOptions.edges}}
-                                        {{#each node.values.edges}}
-                                        <div option-price-data="" option-entityid="attribute[{{../node.entityId}}]" data-option-values="{{node.entityId}}" data-value="{{node.label}}">{{node.label}} <span>     {{#with (lookup ../../node.variants.edges @index)}}${{node.prices.price.value}}{{/with}}</span></div>
-                                        {{/each}}
-                                    {{/forEach}}
-                                </div>
-                                </div>
-                            </div>
-                            <input type="text" class="hidden-inputs" name="" value="" required>
-                            <button class="custom-add-to-cart" type="submit" cart-urls={{node.addToCartUrl}}><svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>Add to Cart</button>
-                        </form>
-                        {{/lt}}
-                {{/if}}
-            {{/each}}
-        {{/if}}
-</div>
+    
 </article>

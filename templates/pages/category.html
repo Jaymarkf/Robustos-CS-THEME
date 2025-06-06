@@ -15,62 +15,6 @@ category:
 blog:
     recent_posts:
         limit: {{theme_settings.homepage_blog_posts_count}}
-gql: "query Experiment($categoryId: Int!) {
-  site {
-    category(entityId: $categoryId) {
-      entityId
-      name
-      products(first: 50, sortBy: DEFAULT) {
-        edges {
-          node {
-            name
-            entityId
-            addToCartUrl
-            showCartAction
-            variants {
-              edges {
-                node {
-                  entityId
-                  sku
-                  prices {
-                    price {
-                      value
-                      currencyCode
-                    }
-                  }
-                }
-              }
-            }
-            productOptions(first: 50) {
-              edges {
-                node {
-                  entityId
-                  displayName
-                  isRequired
-                  ... on CheckboxOption {
-                    checkedByDefault
-                  }
-                  ... on MultipleChoiceOption {
-                    values(first: 50) {
-                      edges {
-                        node {
-                          entityId
-                          label
-                          isDefault
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"
 ---
 {{inject 'productId' product.id}}
 {{inject "categoryProductsPerPage" theme_settings.categorypage_products_per_page}}
@@ -101,7 +45,7 @@ gql: "query Experiment($categoryId: Int!) {
 {{{category.description}}}
 <div class="page" style="display:flex;margin:0;" category_container>
     <main class="page-content" id="product-listing-container">
-        {{> components/category/product-listing}}
+        {{> components/category/product-listing gql=gql}}
     </main>
     {{#if category.faceted_search_enabled}}
         <aside class="page-sidebar" id="faceted-search-container" category_mac>
@@ -117,6 +61,211 @@ gql: "query Experiment($categoryId: Int!) {
         </aside>
     {{/if}}
 </div>
+{{inject "products" category.products}}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+  function callOptions(){
+        var jsContext = JSON.parse({{jsContext}});
+        var prod = jsContext.products;
+        var entityIds = Object.values(prod).map(p => p.id);
+        var idString = entityIds.join(',');
+        const query = `
+        {
+        site {
+            products(entityIds: [
+            ${idString}
+            ], first: 50) {
+            edges {
+                cursor
+                node {
+                name
+                entityId
+                showCartAction
+                addToCartUrl
+                variants {
+                    edges {
+                    node {
+                        entityId
+                        productOptions(first: 50) {
+                        edges {
+                            node {
+                            entityId
+                            displayName
+                            ... on CheckboxOption {
+                                checkedByDefault
+                            }
+                            ... on MultipleChoiceOption {
+                                values(first: 50) {
+                                edges {
+                                    node {
+                                    entityId
+                                    label
+                                    isDefault
+                                    }
+                                }
+                                }
+                            }
+                            }
+                        }
+                        }
+                        sku
+                        prices {
+                        price {
+                            value
+                            currencyCode
+                        }
+                        }
+                    }
+                    }
+                }
+                }
+            }
+            }
+        }
+        }
+        `;
+
+        fetch('/graphql', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {{ settings.storefront_api.token }}' 
+        },
+        body: JSON.stringify({ query })
+        })
+        .then(res => res.json())
+        .then(data => {
+            var bs = data.data.site.products.edges;
+            bs.forEach(function(els,keys){
+                    var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
+                        if (li_product) {
+                              var container = li_product.querySelector('.container-add-to-cart');
+                            if(els.node.variants.edges[0].node.productOptions.edges.length == 1){
+                                var select = els.node.variants.edges[0].node.productOptions.edges[0].node.displayName;
+                                var options_container ='';
+
+                                els.node.variants.edges.forEach(function(options_data,index_options){
+                                    options_container += `
+                                        <div option-price-data=""
+                                            option-entityid="attribute[${options_data.node.productOptions.edges[0].node.entityId}]"
+                                            data-value="${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}"
+                                            data-option-values="${options_data.node.productOptions.edges[0].node.values.edges[0].node.entityId}">
+                                            ${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}
+                                            <span>
+                                            $${options_data.node.prices.price.value}
+                                            </span>
+                                        </div>     
+                                        `;
+                                });
+                             
+                                var formHTML = `
+                                <form class="form-custom-option" method="get">
+                                <div class="container-custom-options">
+                                    <div class="dropdown--j">
+                                    <div class="dropdown-button--j">
+                                        <span class="selected-text--j">Select ${select}</span>
+                                        <i class="chevron--j"></i>
+                                    </div>
+                                    <div class="dropdown-menu--j">
+                                    ${options_container}
+                                    </div>
+                                </div>
+                                <input type="text" class="hidden-inputs" name="" value="" required>
+                                <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
+                                    <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                    Add to Cart
+                                </button>
+                                </form>`;
+
+                                if (!container) {
+                                    // If the container doesn't exist, create it and add the form
+                                    var main = document.createElement('div');
+                                    main.setAttribute('class', 'container-add-to-cart');
+                                    main.innerHTML = formHTML;
+                                    li_product.appendChild(main);
+                                } else {
+                                    // If container already exists, just replace its contents with updated form
+                                    container.innerHTML = formHTML;
+                                }
+
+                            }
+                        }
+            });
+            initDropDowns();
+        });
+}
+
+callOptions();
+
+});
+  function initDropDowns(){
+            document.querySelectorAll('.dropdown-button--j').forEach(button => {
+                button.addEventListener('click', function () {
+                const dropdown = this.closest('.dropdown--j');
+                const menu = dropdown.querySelector('.dropdown-menu--j');
+                const chevron = dropdown.querySelector('.chevron--j');
+                menu.classList.toggle('show--j');
+                chevron.classList.toggle('up--j');
+                });
+            });
+
+            document.querySelectorAll('.dropdown-menu--j div').forEach(option => {
+                option.addEventListener('click', function () {
+                    const dropdown = this.closest('.dropdown--j');
+                    const selectedText = dropdown.querySelector('.selected-text--j');
+                    const menu = dropdown.querySelector('.dropdown-menu--j');
+                    const chevron = dropdown.querySelector('.chevron--j');
+                    const parent = dropdown.closest('form');
+                    const hidden_input = parent.querySelector('input');
+
+                    const label = this.getAttribute('data-value');
+                    console.log(this.textContent);
+                    const price = this.querySelector('span')?.textContent?.trim() || '';
+
+                    // Set combined label + price
+                    selectedText.innerHTML = `${label} <span>${price}</span>`;
+
+                    hidden_input.setAttribute('name', this.getAttribute('option-entityid'));
+                    hidden_input.setAttribute('value', this.getAttribute('data-option-values'));
+
+                    menu.classList.remove('show--j');
+                    chevron.classList.remove('up--j');
+                });
+            });
+               document.querySelectorAll('.custom-add-to-cart').forEach(crt=>{
+                crt.addEventListener('click',function(b){
+                    const parent = crt.closest('form');
+                    const at = this.previousElementSibling;
+                    const query = at.getAttribute('name') + "=" + at.value;
+                    if (parent.reportValidity()) {
+                        b.preventDefault();
+                        const parentUrl = this.getAttribute('cart-urls');
+                        const cartUrl = parentUrl +"&"+ query;
+                        window.location.href = cartUrl;
+                    }
+
+                });
+               });
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                document.querySelectorAll('.dropdown--j').forEach(dropdown => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.querySelector('.dropdown-menu--j').classList.remove('show--j');
+                    dropdown.querySelector('.chevron--j').classList.remove('up--j');
+                }
+                });
+            });
+    }
+    function getDirectText(element) {
+      let text = '';
+      element.childNodes.forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          text += node.textContent.trim();
+        }
+      });
+      return text;
+    }
+</script>
 
 {{/partial}}
 {{> layout/base}}
