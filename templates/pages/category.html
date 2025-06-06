@@ -135,7 +135,16 @@ blog:
         })
         .then(res => res.json())
         .then(data => {
+            // Sort variant edges for each product
+            data.data.site.products.edges.forEach(product => {
+                product.node.variants.edges.sort((a, b) => 
+                    a.node.prices.price.value - b.node.prices.price.value
+                );
+            });
+            console.log(data);
+            // Now assign sorted products to bs
             var bs = data.data.site.products.edges;
+
             bs.forEach(function(els,keys){
                     var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
                         if (li_product) {
