@@ -69,6 +69,11 @@
         <link rel="preload" href="{{cdn 'webdav:GothamBook.ttf'}}" as="font" type="font/ttf" crossorigin> 
 
         <style>
+        
+        .container-blurb-header-text {
+            visibility: hidden;
+        }
+        
         /* @font-face declarations for each font weight */
 
         /* Thin (100) */
@@ -443,12 +448,15 @@
             
             // Get the height of <header>
             const headerBottom = header.getBoundingClientRect().bottom;
-            const header_con = document.querySelector('.container-flex');
+            const redTopBar = document.querySelector('header.header nav.navUser');
+            const heightTopBar = redTopBar.getBoundingClientRect().bottom;
+
    
             if (headerBottom <= 0) {
                 // Make <main> sticky
+                redTopBar.style.position = "fixed";
                 main.style.position = "fixed";
-                main.style.top = "0";
+                main.style.top =  heightTopBar + "px";
                 main.style.zIndex = "1";
                 main.style.background = "white"; // Optional for visibility
                 main.style.width = "100%";
@@ -457,39 +465,43 @@
             } else {
                 // Reset <main> to its original position
                 main.style.position = "static";
+                redTopBar.style.position = "static";
                 main.classList.remove('script-sticky'); // Remove the class
             }
             });
         </script>
         {{#if template_file '==' 'pages/product'}}
         <script>
-                 document.querySelector('.bn').addEventListener('click', function(e) {
-        e.preventDefault();
-
-        const productForm = document.querySelector('form[action="/cart.php"]');
-        if (!productForm) return;
-
-        if (!productForm.checkValidity()) {
-            productForm.reportValidity();
-            return;
-        }
-
-        // Show loading popup
-        const overlay = document.getElementById('custom-loading-overlay');
-        overlay.style.display = 'flex';
-
-        // Build query string from form data
-        const formData = new FormData(productForm);
-        const params = new URLSearchParams();
-
-        params.append('action', 'add');
-        for (const [key, value] of formData.entries()) {
-            params.append(key, value);
-        }
-
-        // Redirect via GET — browser reloads page, popup visible until unload
-        window.location.href = '/cart.php?' + params.toString();
-        });
+            document.addEventListener("DOMContentLoaded",function(){
+                        document.querySelector('.bn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                            
+                        const productForm = document.querySelector('form[action="{{settings.base_url}}/cart.php"]');
+                        if (!productForm) return;
+                
+                        if (!productForm.checkValidity()) {
+                            productForm.reportValidity();
+                            return;
+                        }
+                
+                        // Show loading popup
+                        const overlay = document.getElementById('custom-loading-overlay');
+                        overlay.style.display = 'flex';
+                
+                        // Build query string from form data
+                        const formData = new FormData(productForm);
+                        const params = new URLSearchParams();
+                
+                        params.append('action', 'add');
+                        for (const [key, value] of formData.entries()) {
+                            params.append(key, value);
+                        }
+                
+                        // Redirect via GET — browser reloads page, popup visible until unload
+                        window.location.href = '/cart.php?' + params.toString();
+                        
+                        });
+            });
         </script>
         {{/if}}
         

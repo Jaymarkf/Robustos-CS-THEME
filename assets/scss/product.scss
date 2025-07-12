@@ -217,7 +217,6 @@ button.slick-prev{
 }
 .add-to-cart-buttons {
     padding-left:0 !important;
-    width:max-content !important;
     @media(max-width:1044px){
         width:100% !important;
         margin-right:0;
@@ -354,10 +353,8 @@ dl.productView-info{
 }
 
 .form.form-wishlist.form-action{
-    width:max-content;
-    @media(max-width:1231px){
-        margin-top:15px;
-    }
+    width:100%;
+    margin-top:0;
     @media(max-width:1044px){
             width:100%;
     }
@@ -379,4 +376,24 @@ dl.productView-info{
         padding-left:8px;
     }
    }
+}
+
+.klaviyo-bis-trigger{
+    width:100% !important;
+}
+@media(max-width:1425px){
+    .klaviyo-bis-trigger{
+        margin-bottom:7px;
+        width:100% !important;
+    }
+    .bn{
+        width:100% !important;
+    }
+    [data-wishlist-add] [data-dropdown="wishlist-dropdown"]{
+        margin-top:7px !important;
+        width:100% !important;
+    }
+}
+#bn{
+    width:100%;
 }

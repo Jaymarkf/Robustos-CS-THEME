@@ -226,10 +226,19 @@ export default class ProductDetailsBase {
      * @param  {Object} data Product attribute data
      */
     updateView(data, content = null) {
+        //custom
+        const buyNow = document.querySelector('#bn');
+        if(!data.instock){
+            buyNow.classList.add('disabled-cta');
+            buyNow.setAttribute('disabled','disabled');
+
+        }else{
+            buyNow.classList.remove('disabled-cta');
+            buyNow.removeAttribute('disabled');
+        }
+        //end of custom
         const viewModel = this.getViewModel(this.$scope);
-
         this.showMessageBox(data.stock_message || data.purchasing_message);
-
         if (data.price instanceof Object) {
             this.updatePriceView(viewModel, data.price);
         } else {
@@ -289,6 +298,8 @@ export default class ProductDetailsBase {
         if (addToCartWrapper.is(':hidden') && data.purchasable) {
             addToCartWrapper.show();
         }
+
+        
     }
 
     /**
@@ -353,7 +364,6 @@ export default class ProductDetailsBase {
      */
     showMessageBox(message) {
         const $messageBox = $('.productAttributes-message');
-
         if (message) {
             $('.alertBox-message', $messageBox).text(message);
             $messageBox.show();

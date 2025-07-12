@@ -19,7 +19,7 @@
         {{#unless theme_settings.hide_content_navigation}}
             {{#each pages}}
                 {{!--note this condition 'or' is to not include the navigation (its PAGES) --}}
-                {{#or (if name '==' 'Foundation Charter Oak Habano')(if name '==' 'Blog') (if name '==' 'Contact') (if name '==' 'Privacy Policy') (if name '==' 'Terms & Conditions') (if name '==' 'Return and Refund Policy') (if name '==' 'Shipping Policy')}}
+                {{#or (if name '==' 'Events') (if name '==' 'Foundation Charter Oak Habano')(if name '==' 'Blog') (if name '==' 'Contact') (if name '==' 'Privacy Policy') (if name '==' 'Terms & Conditions') (if name '==' 'Return and Refund Policy') (if name '==' 'Shipping Policy')}}
                 {{else}}
                  <li class="navPages-item navPages-item-page">
                      <a class="navPages-action{{#if name '==' ../page.title}} activePage{{/if}}"

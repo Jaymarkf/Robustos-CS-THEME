@@ -63,8 +63,7 @@ blog:
 </div>
 {{inject "products" category.products}}
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-  function callOptions(){
+     function callOptions(){
         var jsContext = JSON.parse({{jsContext}});
         var prod = jsContext.products;
         var entityIds = Object.values(prod).map(p => p.id);
@@ -79,6 +78,9 @@ blog:
                 cursor
                 node {
                 name
+                inventory{
+                  isInStock
+                }
                 entityId
                 showCartAction
                 addToCartUrl
@@ -86,6 +88,9 @@ blog:
                     edges {
                     node {
                         entityId
+                        inventory{
+                          isInStock
+                        }
                         productOptions(first: 50) {
                         edges {
                             node {
@@ -141,73 +146,110 @@ blog:
                     a.node.prices.price.value - b.node.prices.price.value
                 );
             });
-            console.log(data);
             // Now assign sorted products to bs
             var bs = data.data.site.products.edges;
 
             bs.forEach(function(els,keys){
-                    var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
-                        if (li_product) {
-                              var container = li_product.querySelector('.container-add-to-cart');
-                            if(els.node.variants.edges[0].node.productOptions.edges.length == 1){
-                                var select = els.node.variants.edges[0].node.productOptions.edges[0].node.displayName;
-                                var options_container ='';
+                if(els.node.inventory.isInStock){
+                        var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
+                            if (li_product) {
+                                var container = li_product.querySelector('.container-add-to-cart');
+                                if(els.node.variants.edges[0].node.productOptions.edges.length == 1){
+                                    var isInStock = els.node.variants.edges[0]
+                                    var select = els.node.variants.edges[0].node.productOptions.edges[0].node.displayName;
+                                    var options_container ='';
 
-                                els.node.variants.edges.forEach(function(options_data,index_options){
-                                    options_container += `
-                                        <div option-price-data=""
-                                            option-entityid="attribute[${options_data.node.productOptions.edges[0].node.entityId}]"
-                                            data-value="${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}"
-                                            data-option-values="${options_data.node.productOptions.edges[0].node.values.edges[0].node.entityId}">
-                                            ${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}
-                                            <span>
-                                            $${options_data.node.prices.price.value}
-                                            </span>
-                                        </div>     
-                                        `;
-                                });
-                             
-                                var formHTML = `
-                                <form class="form-custom-option" method="get">
-                                <div class="container-custom-options">
-                                    <div class="dropdown--j">
-                                    <div class="dropdown-button--j">
-                                        <span class="selected-text--j">Select ${select}</span>
-                                        <i class="chevron--j"></i>
+                                    els.node.variants.edges.forEach(function(options_data,index_options){
+                                        if(options_data.node.inventory.isInStock){
+                                        options_container += `
+                                            <div option-price-data=""
+                                                option-entityid="attribute[${options_data.node.productOptions.edges[0].node.entityId}]"
+                                                data-value="${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}"
+                                                data-option-values="${options_data.node.productOptions.edges[0].node.values.edges[0].node.entityId}">
+                                                ${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}
+                                                <span>
+                                                $${options_data.node.prices.price.value}
+                                                </span>
+                                            </div>     
+                                            `;
+                                        }
+                                    });
+                                
+                                    var formHTML = `
+                                    <form class="form-custom-option" method="get">
+                                    <div class="container-custom-options">
+                                        <div class="dropdown--j">
+                                        <div class="dropdown-button--j">
+                                            <span class="selected-text--j">Select ${select}</span>
+                                            <i class="chevron--j"></i>
+                                        </div>
+                                        <div class="dropdown-menu--j">
+                                        ${options_container}
+                                        </div>
                                     </div>
-                                    <div class="dropdown-menu--j">
-                                    ${options_container}
-                                    </div>
-                                </div>
-                                <input type="text" class="hidden-inputs" name="" value="" required>
-                                <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
-                                    <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                                    Add to Cart
-                                </button>
-                                </form>`;
+                                    <input type="text" class="hidden-inputs" name="" value="" required>
+                                    <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
+                                        <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                        <span class="ac">Add to Cart</span>
+                                    </button>
+                                    </form>`;
 
-                                if (!container) {
-                                    // If the container doesn't exist, create it and add the form
-                                    var main = document.createElement('div');
-                                    main.setAttribute('class', 'container-add-to-cart');
-                                    main.innerHTML = formHTML;
-                                    li_product.appendChild(main);
-                                } else {
-                                    // If container already exists, just replace its contents with updated form
-                                    container.innerHTML = formHTML;
+                                    if (!container) {
+                                        // If the container doesn't exist, create it and add the form
+                                        var main = document.createElement('div');
+                                        main.setAttribute('class', 'container-add-to-cart');
+                                        main.innerHTML = formHTML;
+                                        li_product.appendChild(main);
+                                    } else {
+                                        // If container already exists, just replace its contents with updated form
+                                        container.innerHTML = formHTML;
+                                    }
+
+
+                                }else{
+                                    var formHTML = `
+                                    <form class="form-custom-option" method="get">
+                                    <input type="text" class="hidden-inputs" name="" value="${els.node.entityId}" required>
+                                    <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
+                                        <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                        <span class="ac">Add to Cart</span>
+                                    </button>
+                                    </form>`;
+                                    if (!container) {
+                                        // If the container doesn't exist, create it and add the form
+                                        var main = document.createElement('div');
+                                        main.setAttribute('class', 'container-add-to-cart');
+                                        main.innerHTML = formHTML;
+                                        li_product.appendChild(main);
+                                    } else {
+                                        // If container already exists, just replace its contents with updated form
+                                        container.innerHTML = formHTML;
+                                    }
                                 }
-
                             }
-                        }
+                }else{
+                    
+                }
             });
             initDropDowns();
+            
         });
 }
-
+document.addEventListener('DOMContentLoaded', () => {
 callOptions();
 
+
+
 });
-  function initDropDowns(){
+
+document.addEventListener('click', function (e) {
+  const link = e.target.closest('a.pagination-link');
+  if (link) {
+    e.preventDefault(); // Prevent any default AJAX or SPA behavior
+    location.href = link.href; // Force hard reload
+  }
+});
+function initDropDowns(){
             document.querySelectorAll('.dropdown-button--j').forEach(button => {
                 button.addEventListener('click', function () {
                 const dropdown = this.closest('.dropdown--j');
@@ -228,7 +270,6 @@ callOptions();
                     const hidden_input = parent.querySelector('input');
 
                     const label = this.getAttribute('data-value');
-                    console.log(this.textContent);
                     const price = this.querySelector('span')?.textContent?.trim() || '';
 
                     // Set combined label + price
@@ -243,14 +284,58 @@ callOptions();
             });
                document.querySelectorAll('.custom-add-to-cart').forEach(crt=>{
                 crt.addEventListener('click',function(b){
+                    
                     const parent = crt.closest('form');
                     const at = this.previousElementSibling;
                     const query = at.getAttribute('name') + "=" + at.value;
                     if (parent.reportValidity()) {
+                        crt.querySelector('.ac').textContent = "Adding!";
+                        crt.style.backgroundColor = "#747474";
+                        crt.querySelector('.ac').style.color = "white";
+                        crt.querySelector('svg').style.fill = "white";
+                        crt.setAttribute('disabled','disabled');
                         b.preventDefault();
                         const parentUrl = this.getAttribute('cart-urls');
-                        const cartUrl = parentUrl +"&"+ query;
-                        window.location.href = cartUrl;
+                        var cartUrl = parentUrl + "&" + query;
+                        try {
+                        var parsed = new URL(cartUrl);
+                        var url = parsed.pathname + parsed.search;
+ 
+                        } catch (e) {
+                
+                        }
+                        fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                            }
+                            return response.text(); 
+                        })
+                        .then(data => {
+                            var count = document.querySelector('.countPill.cart-quantity');
+
+                            if (count) {
+                                var current = parseInt(count.textContent.trim(), 10) || 0;
+                                var newCount = current + 1;
+                                count.textContent = newCount;
+
+                                // Only add the class if it doesn't exist
+                                if (!count.classList.contains('countPill--positive')) {
+                                    count.classList.add('countPill--positive');
+                                }
+                                crt.querySelector('.ac').textContent = "Added!";
+                                setTimeout(function(){
+                                crt.querySelector('.ac').textContent = "Add to Cart";
+                                crt.style.backgroundColor = "black";
+                                crt.querySelector('.ac').style.color = "white";
+                                crt.querySelector('svg').style.fill = "white";
+                                crt.removeAttribute('disabled');
+                                },2500);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                        });
                     }
 
                 });
@@ -265,15 +350,17 @@ callOptions();
                 });
             });
     }
-    function getDirectText(element) {
-      let text = '';
-      element.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          text += node.textContent.trim();
-        }
-      });
-      return text;
-    }
+
+function getDirectText(element) {
+    let text = '';
+    element.childNodes.forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent.trim();
+      }
+    });
+    return text;
+}
+
 </script>
 
 {{/partial}}
