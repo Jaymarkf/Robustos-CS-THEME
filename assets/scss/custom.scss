@@ -2505,3 +2505,63 @@ ul.productGrid{
         }
     }
 }
+
+
+.container-back-in-stock{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top:auto;
+    .custom-back-in-stock-button{
+        width:100%;
+        color:white;
+        font-family:'Oswald',sans-serif;
+        font-size:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding: 11px 5px;
+        background-color:var(--Black);
+        transition:0.3s all;
+        &:hover{
+            border:1px solid var(--Black);
+            background-color:white;
+            color:var(--Black);
+            & svg{
+                fill:black !important;
+            }
+        }
+        svg{
+            fill:white;
+            margin-right:8px;
+        }
+    }
+}
+
+.Bis{
+background-color:var(--Black);
+color:white;
+font-family:'Oswald',sans-serif;
+font-size:14px;
+}
+.BisCancel{
+background-color:var(--Black);
+color:white;
+font-family:'Oswald',sans-serif;
+font-size:14px;
+}
+.naBis{
+    color:var(--Red);
+    font-size:22px;
+    font-weight:bold;
+}
+.labelBis{
+    font-size:14px;
+    font-family:'Oswald';
+    color:var(--Red);
+}
+
+.inputBis{
+    font-family:'Oswald',sans-serif;
+    font-size:16px;
+}

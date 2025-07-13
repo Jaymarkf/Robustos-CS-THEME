@@ -149,97 +149,306 @@ blog:
             // Now assign sorted products to bs
             var bs = data.data.site.products.edges;
 
-            bs.forEach(function(els,keys){
-                if(els.node.inventory.isInStock){
-                        var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
-                            if (li_product) {
-                                var container = li_product.querySelector('.container-add-to-cart');
-                                if(els.node.variants.edges[0].node.productOptions.edges.length == 1){
-                                    var isInStock = els.node.variants.edges[0]
-                                    var select = els.node.variants.edges[0].node.productOptions.edges[0].node.displayName;
-                                    var options_container ='';
+bs.forEach(function(els) {
+    const node = els.node;
 
-                                    els.node.variants.edges.forEach(function(options_data,index_options){
-                                        if(options_data.node.inventory.isInStock){
-                                        options_container += `
-                                            <div option-price-data=""
-                                                option-entityid="attribute[${options_data.node.productOptions.edges[0].node.entityId}]"
-                                                data-value="${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}"
-                                                data-option-values="${options_data.node.productOptions.edges[0].node.values.edges[0].node.entityId}">
-                                                ${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}
-                                                <span>
-                                                $${options_data.node.prices.price.value}
-                                                </span>
-                                            </div>     
-                                            `;
-                                        }
-                                    });
-                                
-                                    var formHTML = `
-                                    <form class="form-custom-option" method="get">
-                                    <div class="container-custom-options">
-                                        <div class="dropdown--j">
-                                        <div class="dropdown-button--j">
-                                            <span class="selected-text--j">Select ${select}</span>
-                                            <i class="chevron--j"></i>
-                                        </div>
-                                        <div class="dropdown-menu--j">
-                                        ${options_container}
-                                        </div>
-                                    </div>
-                                    <input type="text" class="hidden-inputs" name="" value="" required>
-                                    <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
-                                        <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                                        <span class="ac">Add to Cart</span>
-                                    </button>
-                                    </form>`;
+    // Check if the product is in stock
+    const isInStock = node.inventory?.isInStock;
 
-                                    if (!container) {
-                                        // If the container doesn't exist, create it and add the form
-                                        var main = document.createElement('div');
-                                        main.setAttribute('class', 'container-add-to-cart');
-                                        main.innerHTML = formHTML;
-                                        li_product.appendChild(main);
-                                    } else {
-                                        // If container already exists, just replace its contents with updated form
-                                        container.innerHTML = formHTML;
-                                    }
+    // Find the product card element by its entity ID
+    const liProduct = document.querySelector(`article.card[data-entity-id="${node.entityId}"]`);
+    if (!liProduct) return; // Skip if not found
 
+    // Gather variant data
+    const variants = node.variants?.edges || [];
 
-                                }else{
-                                    var formHTML = `
-                                    <form class="form-custom-option" method="get">
-                                    <input type="text" class="hidden-inputs" name="" value="${els.node.entityId}" required>
-                                    <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
-                                        <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                                        <span class="ac">Add to Cart</span>
-                                    </button>
-                                    </form>`;
-                                    if (!container) {
-                                        // If the container doesn't exist, create it and add the form
-                                        var main = document.createElement('div');
-                                        main.setAttribute('class', 'container-add-to-cart');
-                                        main.innerHTML = formHTML;
-                                        li_product.appendChild(main);
-                                    } else {
-                                        // If container already exists, just replace its contents with updated form
-                                        container.innerHTML = formHTML;
-                                    }
-                                }
-                            }
-                }else{
-                    
+    // Check if the product has exactly one product option (like just Size or just Color)
+    const hasSingleOption = variants.length > 0 && variants[0].node.productOptions?.edges?.length === 1;
+
+    let container = liProduct.querySelector('.container-add-to-cart'); // container for cart buttons
+    let formHTML = ''; // HTML that will be injected
+
+    if (isInStock) {
+        // === IF THE PRODUCT IS IN STOCK ===
+
+        if (hasSingleOption) {
+            // === IF THERE'S ONLY ONE PRODUCT OPTION ===
+            const optionNode = variants[0].node.productOptions.edges[0].node;
+            const optionName = optionNode.displayName;
+
+            let optionsHTML = '';
+
+            // Loop through each variant and display it as an option if it's in stock
+            variants.forEach(v => {
+                const vNode = v.node;
+                const option = vNode.productOptions?.edges?.[0]?.node;
+                const value = option?.values?.edges?.[0]?.node;
+
+                if (vNode.inventory?.isInStock && option && value) {
+                    optionsHTML += `
+                        <div option-price-data=""
+                             option-entityid="attribute[${option.entityId}]"
+                             data-value="${value.label}"
+                             data-option-values="${value.entityId}">
+                            ${value.label}
+                            <span>$${vNode.prices?.price?.value || '0.00'}</span>
+                        </div>`;
                 }
             });
-            initDropDowns();
+
+            // Create the dropdown form HTML for selecting the option and adding to cart
+            formHTML = `
+                <form class="form-custom-option" method="get">
+                    <div class="container-custom-options">
+                        <div class="dropdown--j">
+                            <div class="dropdown-button--j">
+                                <span class="selected-text--j">Select ${optionName}</span>
+                                <i class="chevron--j"></i>
+                            </div>
+                            <div class="dropdown-menu--j">
+                                ${optionsHTML}
+                            </div>
+                        </div>
+                        <input type="text" class="hidden-inputs" name="" value="" required>
+                        <button class="custom-add-to-cart" type="submit" cart-urls="${node.addToCartUrl}">
+                            <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                            <span class="ac">Add to Cart</span>
+                        </button>
+                    </div>
+                </form>`;
+
+        } else {
+            // === IF THERE ARE NO OPTIONS OR MULTIPLE OPTIONS ===
+            // Use a simple form that just adds the default product to the cart
+            formHTML = `
+                <form class="form-custom-option" method="get">
+                    <input type="text" class="hidden-inputs" name="" value="${node.entityId}" required>
+                    <button class="custom-add-to-cart" type="submit" cart-urls="${node.addToCartUrl}">
+                        <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                        <span class="ac">Add to Cart</span>
+                    </button>
+                </form>`;
+        }
+
+        // === Append or update the add-to-cart form in the product card ===
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'container-add-to-cart';
+            container.innerHTML = formHTML;
+            liProduct.appendChild(container);
+        } else {
+            container.innerHTML = formHTML;
+        }
+
+    }else if (!isInStock && hasSingleOption){
+        // "Notify Me" button with popup; requires selecting a variation if one or more are available
+         
+            const optionNodeBackInStock = variants[0].node.productOptions.edges[0].node;
+            const optionNameBackInStock = optionNodeBackInStock.displayName;
+
+            let optionsHTML = '';
+
+            // Loop through each variant and display it as an option if it's in stock
+            let entityIds = [];
+            let optionLabels = [];
+            let optionPrices = [];
+
+            variants.forEach(function(v) {
+                var vNode = v.node;
+                var option = vNode.productOptions?.edges?.[0]?.node;
+                var value = option?.values?.edges?.[0]?.node;
+
+                if (option && value) {
+                        entityIds.push(vNode.entityId);
+                        optionLabels.push(value.label);
+                        optionPrices.push(vNode.prices?.price?.value?.toFixed(2) || "0.00");
+                }
+            });
+
+            // Step 2: Inject the IDs into the button via JSON.stringify
+                formHTML = `
+                    <div class="container-back-in-stock">
+                        <button class="custom-back-in-stock-button" onclick='backInStock(${JSON.stringify(entityIds)}, ${JSON.stringify(optionLabels)}, ${JSON.stringify(optionPrices)})'>
+                            <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                            <span class="ac">Notify Me When Available</span>
+                        </button>
+                </div>`;
+
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'container-add-to-cart';
+                container.innerHTML = formHTML;
+                liProduct.appendChild(container);
+            } else {
+                container.innerHTML = formHTML;
+            }    
+    
+    } else {
+        // === IF THE PRODUCT IS OUT OF STOCK and no product option then get the variant ID===
+
+        // Create the "Notify Me When Available" button for only 1 product variation (use entityId of variation)
+        const backInStockHTML = `
+            <button class="custom-back-in-stock-button" onclick="backInStock(${node.variants.edges.node.entityId})">
+                <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                <span class="notify">Notify Me When Available</span>
+            </button>`;
+
+        // Check if a container already exists for the out-of-stock UI
+        let bisContainer = liProduct.querySelector('.container-back-in-stock');
+
+        if (!bisContainer) {
+            bisContainer = document.createElement('div');
+            bisContainer.className = 'container-back-in-stock';
+            bisContainer.innerHTML = backInStockHTML;
+            liProduct.appendChild(bisContainer);
+        } else {
+            bisContainer.innerHTML = backInStockHTML;
+        }
+    }
+});
+
+// Initialize dropdown behavior after all UI is updated
+initDropDowns();
+
             
         });
 }
+
+
+function backInStock(idArray,option_name,option_price) {
+    // Create modal if it doesn't exist
+    console.log(option_name,option_price);
+    if (!document.getElementById('back-in-stock-modal')) {
+        const modalHTML = `
+        <div id="back-in-stock-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#00000080;display:flex;justify-content:center;align-items:center;z-index:9999;">
+            <div style="background:#fff;padding:20px;border-radius:8px;max-width:400px;width:90%;position:relative;">
+                <h3 style="margin-bottom:10px;" class="naBis">Notify Me When Available</h3>
+
+                <label for="variant-select" class="labelBis">Choose a Variant:</label>
+                <select class="inputBis"  id="variant-select" style="width:100%;padding:8px;margin:10px 0;"></select>
+
+                <label for="email-input" class="labelBis">Your Email:</label>
+                <input class="inputBis" type="email" id="email-input" placeholder="you@example.com" style="width:100%;padding:8px;margin-bottom:10px;" required>
+
+                <div style="display:flex;justify-content:space-between;">
+                    <button class="BisCancel" onclick="document.getElementById('back-in-stock-modal').remove()" style="padding:8px 12px;">Cancel</button>
+                    <button class="Bis" onclick="submitBackInStock()" style="padding:8px 12px;">Submit</button>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+
+    // Populate select options
+    const select = document.getElementById('variant-select');
+    select.innerHTML = '';
+
+    idArray.forEach(function(id,key) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `${option_name[key]}:               $${option_price[key]}`;
+        select.appendChild(option);
+    });
+
+    // Show modal
+    document.getElementById('back-in-stock-modal').style.display = 'flex';
+}
+
+
+
+function submitBackInStock() {
+    const variantId = document.getElementById('variant-select').value;
+    const email = document.getElementById('email-input').value.trim();
+
+    if (!variantId || !email) {
+        alert('Please select a variant and enter a valid email.');
+        return;
+    }
+
+    const payload = {
+        data: {
+            type: "back-in-stock-subscription",
+            attributes: {
+                profile: {
+                    data: {
+                        type: "profile",
+                        attributes: {
+                            email: email
+                        }
+                    }
+                },
+                channels: ["EMAIL"]
+            },
+            relationships: {
+                variant: {
+                    data: {
+                        type: "catalog-variant",
+                        id: `$bigcommerce:::$default:::${variantId}`
+                    }
+                }
+            }
+        }
+    };
+
+    fetch("https://a.klaviyo.com/client/back-in-stock-subscriptions/?company_id=Wqz2D3", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "revision": "2024-06-15"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(async (response) => {
+        if (response.status === 202) {
+            alert("✅ Subscribed successfully!");
+            document.getElementById('back-in-stock-modal').remove();
+            return;
+        }
+
+        const text = await response.text();
+        let json = {};
+        try {
+            json = JSON.parse(text);
+        } catch {
+            alert("Something went wrong. Please try again.");
+            console.error("Invalid JSON returned:", text);
+            return;
+        }
+
+        const error = json.errors?.[0];
+        if (error) {
+            const msg = error.detail || error.title || "Unknown error occurred.";
+            alert("❌ Error: " + msg);
+            console.error("Klaviyo error:", error);
+        } else {
+            alert("❌ Unexpected error. Please try again.");
+            console.error("Unexpected response:", json);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("❌ Network error. Please check your connection.");
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
 callOptions();
-
-
-
 });
 
 document.addEventListener('click', function (e) {
