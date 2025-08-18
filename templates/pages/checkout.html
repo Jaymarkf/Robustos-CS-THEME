@@ -14,6 +14,9 @@
     margin-right: auto;
     display: block;
 }
+.dynamic-form-field--field_29{
+    display:none !important; 
+}
 </style>
 {{{head.scripts}}}
 
@@ -34,6 +37,153 @@
         </h2>
     </div>
 </header>
+
+
+<script>
+(function () {
+  const targetSelector = '#field_29Input';
+  let isPresent = document.querySelector(targetSelector) !== null;
+
+  // helper: safely set value on field
+  const applyValue = (formattedString) => {
+    setTimeout(() => {
+      const inputEl = document.querySelector(targetSelector);
+      if (!inputEl || !document.body.contains(inputEl)) return;
+
+      // ✅ Use native setter so React (BigCommerce Checkout) detects it
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        "value"
+      ).set;
+      nativeSetter.call(inputEl, formattedString);
+
+      // Fire events so React picks up the change
+      inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+      inputEl.dispatchEvent(new Event("change", { bubbles: true }));
+
+      console.log("✅ Applied value to checkout field:", formattedString);
+    }, 1500); // 1.5 seconds delay
+  };
+
+  const observer = new MutationObserver(() => {
+    const currentlyPresent = document.querySelector(targetSelector) !== null;
+
+    if (currentlyPresent && !isPresent) {
+      isPresent = true;
+
+      // ✅ Perform fetch when element is added
+      fetch("/api/storefront/carts", {
+        credentials: "include"
+      })
+        .then(res => res.json())
+        .then(async (carts) => {
+          if (!Array.isArray(carts) || carts.length === 0) return;
+
+          const cart = carts[0];
+          const physicalItems = cart.lineItems?.physicalItems || [];
+
+          // 1. Collect product IDs and variant SKUs
+          const productIds = [];
+          const variantSkuMap = {}; // { [variantSku]: true }
+
+          for (const item of physicalItems) {
+            productIds.push(item.productId);
+            variantSkuMap[item.sku] = true;
+          }
+
+          // 2. Build GraphQL query
+          const query = `
+            query GetVariantsUPC($ids: [Int!]) {
+              site {
+                products(entityIds: $ids) {
+                  edges {
+                    node {
+                      entityId
+                      sku
+                      upc
+                      variants(first: 250) {
+                        edges {
+                          node {
+                            entityId
+                            sku
+                            upc
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          `;
+
+          const gqlRes = await fetch('/graphql', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer {{ settings.storefront_api.token }}"
+            },
+            body: JSON.stringify({
+              query,
+              variables: { ids: productIds }
+            })
+          });
+
+          const gqlData = await gqlRes.json();
+          const products = gqlData?.data?.site?.products?.edges || [];
+
+          const matchedVariants = [];
+
+          // 4. Loop through GraphQL results and match variant SKUs
+          for (const product of products) {
+            const parentUpc = product.node.upc;
+            const parentSku = product.node.sku;
+
+            const variants = product.node.variants?.edges || [];
+
+            for (const variant of variants) {
+              const variantSku = variant.node.sku;
+              const variantUpc = variant.node.upc;
+
+              // Check if this variant SKU matches anything from the cart
+              if (variantSkuMap[variantSku]) {
+                matchedVariants.push({
+                  productId: product.node.entityId,
+                  variantSku,
+                  parentSku,
+                  parentUpc,
+                  variantUpc
+                });
+              }
+            }
+          }
+
+          console.log("Matched Variants:", matchedVariants);
+
+          const formattedString = matchedVariants
+            .filter(item => item.parentUpc) // skip if no parentUpc
+            .map(item => `sku:${item.variantSku},upc:${item.parentUpc}`)
+            .join("|");
+
+          // ✅ Always re-query field before applying value
+          applyValue(formattedString);
+        })
+        .catch(err => console.error("Cart fetch error:", err));
+
+    } else if (!currentlyPresent && isPresent) {
+      isPresent = false;
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+})();
+</script>
+
+
+
 
 {{{ checkout.checkout_content }}}
 

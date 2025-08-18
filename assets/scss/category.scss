@@ -44,6 +44,9 @@ h1.page-heading{
 @media(max-width:768px){
     aside.page-sidebar *{
         text-transform:uppercase;
+        padding-bottom:5px;
+        padding-top:4px;
+        margin-bottom:5px;
     }
     h2.sidebarBlock-heading{
         font-size:22px;

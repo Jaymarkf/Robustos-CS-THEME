@@ -378,8 +378,11 @@
                     speed:1200,
                     autoHeight:true
                 } );
+                splide.on('moved',function(){
+                    splide.refresh();
+                });
                 splide.mount();
-            } );
+                });
             </script>
         <script>
                 /**show and hide the search navigation bar**/
@@ -464,8 +467,8 @@
 
             } else {
                 // Reset <main> to its original position
-                main.style.position = "static";
-                redTopBar.style.position = "static";
+                main.style.position = "";
+                redTopBar.style.position = "";
                 main.classList.remove('script-sticky'); // Remove the class
             }
             });
