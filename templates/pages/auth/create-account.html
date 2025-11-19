@@ -22,6 +22,7 @@
                         {{inject 'state_error' (lang 'errors.state_error')}}
                     </div>
                     {{{ forms.create_account.recaptcha.markup}}}
+                    <h3 style="text-align:center;"><strong>To complete your account registration, please email your business tax documents to info@crownusawholesale.com. Your account will be reviewed and activated once we receive and verify them.</strong></h3>
                     <div class="form-actions">
                         <input type="submit" class="button button--primary" value="{{lang 'forms.create_account.submit_value' }}" />
                     </div>
@@ -31,3 +32,10 @@
     </div>
 {{/partial}}
 {{> layout/base}}
+
+<style>
+    /* hide custom input UPC-EAN */
+    #FormField_29{
+        display:none !important;
+    }
+</style>

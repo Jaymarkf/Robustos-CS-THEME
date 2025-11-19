@@ -83,6 +83,8 @@
                 {{/if}}
             </div>
             <div class="listItem-actions">
+                {{#unless customer_group_id theme_settings.customer_group_restriction_id}}
+                {{> components/products/bulk-discount-rates product_id=id }}
                 {{#or customer (unless settings.hide_price_from_guests)}}
                     {{#if price}}
                         <div class="listItem-price">{{> components/products/price price=price}}</div>
@@ -110,6 +112,7 @@
                         {{lang "products.compare"}} <input type="checkbox" name="products[]" value="{{id}}" id="compare-{{id}}" data-compare-id="{{id}}">
                     </label>
                 {{/if}}
+                {{/unless}}
             </div>
         </div>
     </div>

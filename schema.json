@@ -1,5 +1,21 @@
 [
   {
+     "name": "CUSTOMER GROUP SETTINGS",
+     "settings":[
+      {
+        "type":"heading",
+        "content": "RESTRICTION SETTINGS"
+      },
+      {
+        "type":"number",
+        "label": "Customer Group ID to Restrict",
+        "id": "customer_group_restriction_id",
+        "default": 0,
+        "min": 1
+      }
+     ]
+  },
+  {
     "name": "i18n.Global",
     "settings": [
       {

@@ -5,9 +5,9 @@
 {{/if}}
 <div data-list-name="Search Results">
     {{#if theme_settings.product_list_display_mode '===' 'grid'}}
-        {{> components/products/grid products=product_results.products show_compare=product_results.show_compare event="list" theme_settings=theme_settings new=products.new top_seller=products.top_sellers best_seller=products.featured}}
+        {{> components/products/grid customer_group_id=customer_group_id products=product_results.products show_compare=product_results.show_compare event="list" theme_settings=theme_settings new=products.new top_seller=products.top_sellers best_seller=products.featured}}
     {{else}}
-        {{> components/products/list products=product_results.products show_compare=product_results.show_compare event="list" theme_settings=theme_settings new=products.new top_seller=products.top_sellers best_seller=products.featured}}
+        {{> components/products/list customer_group_id=customer_group_id products=product_results.products show_compare=product_results.show_compare event="list" theme_settings=theme_settings new=products.new top_seller=products.top_sellers best_seller=products.featured}}
     {{/if}}
 </div>
 

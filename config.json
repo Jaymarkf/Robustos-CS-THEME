@@ -1,5 +1,5 @@
 {
-  "name": "13-07-2025 CS Updated",
+  "name": "07-09-2025 Crown USA WHOLESALE",
   "version": "6.16.1",
   "template_engine": "handlebars_v4",
   "meta": {
@@ -464,6 +464,7 @@
             "switch_url": "https://cornerstone-warm-demo.mybigcommerce.com"
           }
         ],
+        "customer_group_restriction_id": 1,
         "show_channels": false,
         "hide_breadcrumbs": false,
         "hide_page_heading": false,

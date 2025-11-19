@@ -64,7 +64,7 @@ gql: "query Experiment($productId: Int!) {
     {{/each}}
     <div class="container-main-product">
         <div class="col-main-product-container">
-            {{> components/products/product-view gql=gql}}
+            {{> components/products/product-view customer_group_id=customer_group_id gql=gql}}
     
             {{{region name="product_below_content"}}}
     

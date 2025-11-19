@@ -45,7 +45,7 @@ blog:
 {{{category.description}}}
 <div class="page" style="display:flex;margin:0;" category_container>
     <main class="page-content" id="product-listing-container">
-        {{> components/category/product-listing gql=gql}}
+        {{> components/category/product-listing gql=gql customer_group_id=customer_group_id}}
     </main>
     {{#if category.faceted_search_enabled}}
         <aside class="page-sidebar" id="faceted-search-container" category_mac>
@@ -61,6 +61,8 @@ blog:
         </aside>
     {{/if}}
 </div>
+{{#unless customer_group_id theme_settings.customer_group_restriction_id}}
+{{#if customer}}
 {{inject "products" category.products}}
 <script>
      function callOptions(){
@@ -84,6 +86,9 @@ blog:
                 entityId
                 showCartAction
                 addToCartUrl
+                availabilityV2{
+                  status
+                }
                 variants {
                     edges {
                     node {
@@ -154,6 +159,7 @@ bs.forEach(function(els) {
 
     // Check if the product is in stock
     const isInStock = node.inventory?.isInStock;
+    const availability = node.availabilityV2?.status;
 
     // Find the product card element by its entity ID
     const liProduct = document.querySelector(`article.card[data-entity-id="${node.entityId}"]`);
@@ -170,7 +176,8 @@ bs.forEach(function(els) {
 
     if (isInStock) {
         // === IF THE PRODUCT IS IN STOCK ===
-
+         var labels = availability === "Preorder" ? "Pre Order" : "Add to Cart";
+         var extraClass = availability === "Preorder" ? "preorder-btn" : "";
         if (hasSingleOption) {
             // === IF THERE'S ONLY ONE PRODUCT OPTION ===
             const optionNode = variants[0].node.productOptions.edges[0].node;
@@ -210,9 +217,9 @@ bs.forEach(function(els) {
                             </div>
                         </div>
                         <input type="text" class="hidden-inputs" name="" value="" required>
-                        <button class="custom-add-to-cart" type="submit" cart-urls="${node.addToCartUrl}">
+                        <button class="custom-add-to-cart ${extraClass}" type="submit" cart-urls="${node.addToCartUrl}">
                             <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                            <span class="ac">Add to Cart</span>
+                            <span class="ac">${labels}</span>
                         </button>
                     </div>
                 </form>`;
@@ -220,12 +227,13 @@ bs.forEach(function(els) {
         } else {
             // === IF THERE ARE NO OPTIONS OR MULTIPLE OPTIONS ===
             // Use a simple form that just adds the default product to the cart
+           
             formHTML = `
                 <form class="form-custom-option" method="get">
                     <input type="text" class="hidden-inputs" name="" value="${node.entityId}" required>
-                    <button class="custom-add-to-cart" type="submit" cart-urls="${node.addToCartUrl}">
+                    <button class="custom-add-to-cart ${extraClass}" type="submit" cart-urls="${node.addToCartUrl}">
                         <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                        <span class="ac">Add to Cart</span>
+                        <span class="ac">${labels}</span>
                     </button>
                 </form>`;
         }
@@ -390,7 +398,7 @@ function submitBackInStock() {
         }
     };
 
-    fetch("https://a.klaviyo.com/client/back-in-stock-subscriptions/?company_id=Wqz2D3", {
+    fetch("https://a.klaviyo.com/client/back-in-stock-subscriptions/?company_id=Wra9NB", {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -534,7 +542,11 @@ function initDropDowns(){
                                 }
                                 crt.querySelector('.ac').textContent = "Added!";
                                 setTimeout(function(){
-                                crt.querySelector('.ac').textContent = "Add to Cart";
+                                if(crt.classList.contains('preorder-btn')){
+                                    crt.querySelector('.ac').textContent = "Pre Order";
+                                } else {
+                                    crt.querySelector('.ac').textContent = "Add to Cart";
+                                }
                                 crt.style.backgroundColor = "black";
                                 crt.querySelector('.ac').style.color = "white";
                                 crt.querySelector('svg').style.fill = "white";
@@ -571,6 +583,7 @@ function getDirectText(element) {
 }
 
 </script>
-
+{{/if}}
+{{/unless}}
 {{/partial}}
 {{> layout/base}}
