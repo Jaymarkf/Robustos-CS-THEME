@@ -64,7 +64,7 @@ gql: "query Experiment($productId: Int!) {
     {{/each}}
     <div class="container-main-product">
         <div class="col-main-product-container">
-            {{> components/products/product-view customer_group_id=customer_group_id gql=gql}}
+            {{> components/products/product-view gql=gql}}
     
             {{{region name="product_below_content"}}}
     
@@ -152,222 +152,408 @@ gql: "query Experiment($productId: Int!) {
 
 {{inject "products" product.related_products}}
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-  function callOptions(){
-        var jsContext = JSON.parse({{jsContext}});
-        var prod = jsContext.products;
-        var entityIds = Object.values(prod).map(p => p.id);
-        var idString = entityIds.join(',');
-        const query = `
-        {
+function callOptions(){
+    var jsContext = JSON.parse({{jsContext}});
+    var prod = jsContext.products;
+    var entityIds = Object.values(prod).map(p => p.id);
+    var idString = entityIds.join(',');
+    const query = `
+    {
         site {
             products(entityIds: [
-            ${idString}
+                ${idString}
             ], first: 50) {
-            edges {
-                cursor
-                node {
-                name
-                entityId
-                showCartAction
-                addToCartUrl
-                variants {
-                    edges {
+                edges {
+                    cursor
                     node {
-                        entityId
-                        inventory{
-                          isInStock
+                        name
+                        inventory {
+                            isInStock
                         }
-                        productOptions(first: 50) {
-                        edges {
-                            node {
-                            entityId
-                            displayName
-                            ... on CheckboxOption {
-                                checkedByDefault
-                            }
-                            ... on MultipleChoiceOption {
-                                values(first: 50) {
-                                edges {
-                                    node {
+                        entityId
+                        showCartAction
+                        addToCartUrl
+                        availabilityV2 {
+                            status
+                        }
+                        variants {
+                            edges {
+                                node {
                                     entityId
-                                    label
-                                    isDefault
+                                    inventory {
+                                        isInStock
+                                    }
+                                    productOptions(first: 50) {
+                                        edges {
+                                            node {
+                                                entityId
+                                                displayName
+                                                ... on CheckboxOption {
+                                                    checkedByDefault
+                                                }
+                                                ... on MultipleChoiceOption {
+                                                    values(first: 50) {
+                                                        edges {
+                                                            node {
+                                                                entityId
+                                                                label
+                                                                isDefault
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    sku
+                                    prices {
+                                        price {
+                                            value
+                                            currencyCode
+                                        }
                                     }
                                 }
-                                }
-                            }
                             }
                         }
-                        }
-                        sku
-                        prices {
-                        price {
-                            value
-                            currencyCode
-                        }
-                        }
-                    }
                     }
                 }
-                }
-            }
             }
         }
-        }
-        `;
+    }`;
 
-        fetch('/graphql', {
+    fetch('/graphql', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {{ settings.storefront_api.token }}' 
         },
         body: JSON.stringify({ query })
-        })
-        .then(res => res.json())
-        .then(data => {
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Sort variant edges for each product
+        data.data.site.products.edges.forEach(product => {
+            product.node.variants.edges.sort((a, b) => 
+                a.node.prices.price.value - b.node.prices.price.value
+            );
+        });
 
-            data.data.site.products.edges.forEach(product => {
-                product.node.variants.edges.sort((a, b) => 
-                    a.node.prices.price.value - b.node.prices.price.value
-                );
-            });
-            var bs = data.data.site.products.edges;
-            bs.forEach(function(els,keys){
-                    var li_product = document.querySelector('article.card[data-entity-id="'+ els.node.entityId +'"]');
-                        if (li_product) {
-                              var container = li_product.querySelector('.container-add-to-cart');
-                            if(els.node.variants.edges[0].node.productOptions.edges.length == 1){
-                                var select = els.node.variants.edges[0].node.productOptions.edges[0].node.displayName;
-                                var options_container ='';
+        var bs = data.data.site.products.edges;
+        console.log(bs);
 
-                                els.node.variants.edges.forEach(function(options_data,index_options){
-                                    if(options_data.node.inventory.isInStock){
-                                    options_container += `
-                                        <div option-price-data=""
-                                            option-entityid="attribute[${options_data.node.productOptions.edges[0].node.entityId}]"
-                                            data-value="${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}"
-                                            data-option-values="${options_data.node.productOptions.edges[0].node.values.edges[0].node.entityId}">
-                                            ${options_data.node.productOptions.edges[0].node.values.edges[0].node.label}
-                                            <span>
-                                            $${options_data.node.prices.price.value}
-                                            </span>
-                                        </div>     
-                                        `;
-                                    }
-                                });
-                             
-                                var formHTML = `
-                                <form class="form-custom-option" method="get">
-                                <div class="container-custom-options">
-                                    <div class="dropdown--j">
+        bs.forEach(function(els) {
+            const node = els.node;
+            const variants = node.variants?.edges || [];
+            const productInStock = node.inventory?.isInStock;
+            const anyVariantInStock = variants.some(v => v.node.inventory?.isInStock);
+            const hasSingleOption = variants.length > 0 && variants[0].node.productOptions?.edges?.length === 1;
+
+            // Decide whether to show Add to Cart or Notify Me
+            const showAddToCart = productInStock && anyVariantInStock;
+
+            // Find product card element
+            const liProduct = document.querySelector(`article.card[data-entity-id="${node.entityId}"]`);
+            if (!liProduct) return;
+
+            let container = liProduct.querySelector('.container-add-to-cart');
+            let formHTML = '';
+
+            if (showAddToCart) {
+                // === Add to Cart logic ===
+                var labels = node.availabilityV2?.status === "Preorder" ? "Pre Order" : "Add to Cart";
+                var extraClass = node.availabilityV2?.status === "Preorder" ? "preorder-btn" : "";
+
+                if (hasSingleOption) {
+                    const optionNode = variants[0].node.productOptions.edges[0].node;
+                    const optionName = optionNode.displayName;
+
+                    let optionsHTML = '';
+
+                    // Only include in-stock variants
+                    variants.forEach(v => {
+                        const vNode = v.node;
+                        const option = vNode.productOptions?.edges?.[0]?.node;
+                        const value = option?.values?.edges?.[0]?.node;
+
+                        if (vNode.inventory?.isInStock && option && value) {
+                            optionsHTML += `
+                                <div option-price-data=""
+                                     option-entityid="attribute[${option.entityId}]"
+                                     data-value="${value.label}"
+                                     data-option-values="${value.entityId}">
+                                    ${value.label}
+                                    <span>$${vNode.prices?.price?.value || '0.00'}</span>
+                                </div>`;
+                        }
+                    });
+
+                    formHTML = `
+                        <form class="form-custom-option" method="get">
+                            <div class="container-custom-options">
+                                <div class="dropdown--j">
                                     <div class="dropdown-button--j">
-                                        <span class="selected-text--j">Select ${select}</span>
+                                        <span class="selected-text--j">Select ${optionName}</span>
                                         <i class="chevron--j"></i>
                                     </div>
                                     <div class="dropdown-menu--j">
-                                    ${options_container}
+                                        ${optionsHTML}
                                     </div>
                                 </div>
                                 <input type="text" class="hidden-inputs" name="" value="" required>
-                                <button class="custom-add-to-cart" type="submit" cart-urls="${els.node.addToCartUrl}">
+                                <button class="custom-add-to-cart ${extraClass}" type="submit" cart-urls="${node.addToCartUrl}">
                                     <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
-                                    Add to Cart
+                                    <span class="ac">${labels}</span>
                                 </button>
-                                </form>`;
+                            </div>
+                        </form>`;
+                } else {
+                    // No options or multiple options
+                    formHTML = `
+                        <form class="form-custom-option" method="get">
+                            <input type="text" class="hidden-inputs" name="" value="${node.entityId}" required>
+                            <button class="custom-add-to-cart ${extraClass}" type="submit" cart-urls="${node.addToCartUrl}">
+                                <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                <span class="ac">${labels}</span>
+                            </button>
+                        </form>`;
+                }
+            } else {
+                // === Notify Me logic ===
+                if (hasSingleOption) {
+                    const optionNodeBackInStock = variants[0].node.productOptions.edges[0].node;
+                    const optionNameBackInStock = optionNodeBackInStock.displayName;
 
-                                if (!container) {
-                                    // If the container doesn't exist, create it and add the form
-                                    var main = document.createElement('div');
-                                    main.setAttribute('class', 'container-add-to-cart');
-                                    main.innerHTML = formHTML;
-                                    li_product.appendChild(main);
-                                } else {
-                                    // If container already exists, just replace its contents with updated form
-                                    container.innerHTML = formHTML;
-                                }
+                    let entityIds = [];
+                    let optionLabels = [];
+                    let optionPrices = [];
 
-                            }
+                    variants.forEach(v => {
+                        const vNode = v.node;
+                        const option = vNode.productOptions?.edges?.[0]?.node;
+                        const value = option?.values?.edges?.[0]?.node;
+
+                        if (option && value) {
+                            entityIds.push(vNode.entityId);
+                            optionLabels.push(value.label);
+                            optionPrices.push(vNode.prices?.price?.value?.toFixed(2) || "0.00");
                         }
-            });
-            initDropDowns();
+                    });
+
+                    formHTML = `
+                        <div class="container-back-in-stock">
+                            <button class="custom-back-in-stock-button" onclick='backInStock(${JSON.stringify(entityIds)}, ${JSON.stringify(optionLabels)}, ${JSON.stringify(optionPrices)})'>
+                                <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                <span class="ac">Notify Me When Available</span>
+                            </button>
+                        </div>`;
+                } else {
+                    // Single variant or no options
+                    const firstVariantId = variants[0]?.node.entityId || node.entityId;
+
+                    formHTML = `
+                        <div class="container-back-in-stock">
+                            <button class="custom-back-in-stock-button" onclick="backInStock([${firstVariantId}])">
+                                <svg style="width:24px;height:24px;"><use xlink:href="#icon-font-awesome-shopping-cart"></use></svg>
+                                <span class="ac">Notify Me When Available</span>
+                            </button>
+                        </div>`;
+                }
+            }
+
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'container-add-to-cart';
+                container.innerHTML = formHTML;
+                liProduct.appendChild(container);
+            } else {
+                container.innerHTML = formHTML;
+            }
         });
+
+        initDropDowns();
+    });
 }
 
-callOptions();
+// === Back in stock modal ===
+function backInStock(idArray, option_name, option_price) {
+    if (!document.getElementById('back-in-stock-modal')) {
+        const modalHTML = `
+        <div id="back-in-stock-modal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#00000080;display:flex;justify-content:center;align-items:center;z-index:9999;">
+            <div style="background:#fff;padding:20px;border-radius:8px;max-width:400px;width:90%;position:relative;">
+                <h3 style="margin-bottom:10px;" class="naBis">Notify Me When Available</h3>
+                <label for="variant-select" class="labelBis">Choose a Variant:</label>
+                <select class="inputBis"  id="variant-select" style="width:100%;padding:8px;margin:10px 0;"></select>
+                <label for="email-input" class="labelBis">Your Email:</label>
+                <input class="inputBis" type="email" id="email-input" placeholder="you@example.com" style="width:100%;padding:8px;margin-bottom:10px;" required>
+                <div style="display:flex;justify-content:space-between;">
+                    <button class="BisCancel" onclick="document.getElementById('back-in-stock-modal').remove()" style="padding:8px 12px;">Cancel</button>
+                    <button class="Bis" onclick="submitBackInStock()" style="padding:8px 12px;">Submit</button>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
 
-});
-  function initDropDowns(){
-            document.querySelectorAll('.dropdown-button--j').forEach(button => {
-                button.addEventListener('click', function () {
-                const dropdown = this.closest('.dropdown--j');
-                const menu = dropdown.querySelector('.dropdown-menu--j');
-                const chevron = dropdown.querySelector('.chevron--j');
-                menu.classList.toggle('show--j');
-                chevron.classList.toggle('up--j');
-                });
-            });
+    const select = document.getElementById('variant-select');
+    select.innerHTML = '';
 
-            document.querySelectorAll('.dropdown-menu--j div').forEach(option => {
-                option.addEventListener('click', function () {
-                    const dropdown = this.closest('.dropdown--j');
-                    const selectedText = dropdown.querySelector('.selected-text--j');
-                    const menu = dropdown.querySelector('.dropdown-menu--j');
-                    const chevron = dropdown.querySelector('.chevron--j');
-                    const parent = dropdown.closest('form');
-                    const hidden_input = parent.querySelector('input');
+    idArray.forEach(function(id, key) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = option_name ? `${option_name[key]}: $${option_price[key]}` : id;
+        select.appendChild(option);
+    });
 
-                    const label = this.getAttribute('data-value');
-                    console.log(this.textContent);
-                    const price = this.querySelector('span')?.textContent?.trim() || '';
+    document.getElementById('back-in-stock-modal').style.display = 'flex';
+}
 
-                    // Set combined label + price
-                    selectedText.innerHTML = `${label} <span>${price}</span>`;
+// === Submit back in stock ===
+function submitBackInStock() {
+    const variantId = document.getElementById('variant-select').value;
+    const email = document.getElementById('email-input').value.trim();
 
-                    hidden_input.setAttribute('name', this.getAttribute('option-entityid'));
-                    hidden_input.setAttribute('value', this.getAttribute('data-option-values'));
+    if (!variantId || !email) {
+        alert('Please select a variant and enter a valid email.');
+        return;
+    }
 
-                    menu.classList.remove('show--j');
-                    chevron.classList.remove('up--j');
-                });
-            });
-               document.querySelectorAll('.custom-add-to-cart').forEach(crt=>{
-                crt.addEventListener('click',function(b){
-                    const parent = crt.closest('form');
-                    const at = this.previousElementSibling;
-                    const query = at.getAttribute('name') + "=" + at.value;
-                    if (parent.reportValidity()) {
-                        b.preventDefault();
-                        const parentUrl = this.getAttribute('cart-urls');
-                        const cartUrl = parentUrl +"&"+ query;
-                        window.location.href = cartUrl;
+    const payload = {
+        data: {
+            type: "back-in-stock-subscription",
+            attributes: {
+                profile: {
+                    data: {
+                        type: "profile",
+                        attributes: { email }
                     }
-
-                });
-               });
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function (e) {
-                document.querySelectorAll('.dropdown--j').forEach(dropdown => {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.querySelector('.dropdown-menu--j').classList.remove('show--j');
-                    dropdown.querySelector('.chevron--j').classList.remove('up--j');
+                },
+                channels: ["EMAIL"]
+            },
+            relationships: {
+                variant: {
+                    data: {
+                        type: "catalog-variant",
+                        id: `$bigcommerce:::$default:::${variantId}`
+                    }
                 }
-                });
-            });
-    }
-    function getDirectText(element) {
-      let text = '';
-      element.childNodes.forEach(node => {
-        if (node.nodeType === Node.TEXT_NODE) {
-          text += node.textContent.trim();
+            }
         }
-      });
-      return text;
-    }
+    };
+
+    fetch("https://a.klaviyo.com/client/back-in-stock-subscriptions/?company_id=Wqz2D3", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "revision": "2024-06-15"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(async response => {
+        if (response.status === 202) {
+            alert("✅ Subscribed successfully!");
+            document.getElementById('back-in-stock-modal').remove();
+            return;
+        }
+        const text = await response.text();
+        let json = {};
+        try { json = JSON.parse(text); } catch { alert("Something went wrong. Please try again."); return; }
+        const error = json.errors?.[0];
+        if (error) { alert("❌ Error: " + (error.detail || error.title || "Unknown error")); }
+        else { alert("❌ Unexpected error. Please try again."); console.error(json); }
+    })
+    .catch(err => { console.error(err); alert("❌ Network error. Please check your connection."); });
+}
+
+// === Dropdown behavior and Add to Cart ===
+document.addEventListener('DOMContentLoaded', () => callOptions());
+
+function initDropDowns(){
+    document.querySelectorAll('.dropdown-button--j').forEach(button => {
+        button.addEventListener('click', function () {
+            const dropdown = this.closest('.dropdown--j');
+            const menu = dropdown.querySelector('.dropdown-menu--j');
+            const chevron = dropdown.querySelector('.chevron--j');
+            menu.classList.toggle('show--j');
+            chevron.classList.toggle('up--j');
+        });
+    });
+
+    document.querySelectorAll('.dropdown-menu--j div').forEach(option => {
+        option.addEventListener('click', function () {
+            const dropdown = this.closest('.dropdown--j');
+            const selectedText = dropdown.querySelector('.selected-text--j');
+            const menu = dropdown.querySelector('.dropdown-menu--j');
+            const chevron = dropdown.querySelector('.chevron--j');
+            const parent = dropdown.closest('form');
+            const hidden_input = parent.querySelector('input');
+
+            const label = this.getAttribute('data-value');
+            const price = this.querySelector('span')?.textContent?.trim() || '';
+            selectedText.innerHTML = `${label} <span>${price}</span>`;
+            hidden_input.setAttribute('name', this.getAttribute('option-entityid'));
+            hidden_input.setAttribute('value', this.getAttribute('data-option-values'));
+
+            menu.classList.remove('show--j');
+            chevron.classList.remove('up--j');
+        });
+    });
+
+    document.querySelectorAll('.custom-add-to-cart').forEach(crt => {
+        crt.addEventListener('click', function(e){
+            const parent = crt.closest('form');
+            const at = parent.querySelector('input');
+            const query = at.getAttribute('name') + "=" + at.value;
+
+            if (parent.reportValidity()) {
+                crt.querySelector('.ac').textContent = "Adding!";
+                crt.style.backgroundColor = "#747474";
+                crt.querySelector('.ac').style.color = "white";
+                crt.querySelector('svg').style.fill = "white";
+                crt.setAttribute('disabled','disabled');
+                e.preventDefault();
+
+                const parentUrl = this.getAttribute('cart-urls');
+                var cartUrl = parentUrl + "&" + query;
+                try { var parsed = new URL(cartUrl); var url = parsed.pathname + parsed.search; } catch {}
+
+                fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    return response.text(); 
+                })
+                .then(data => {
+                    var count = document.querySelector('.countPill.cart-quantity');
+                    if (count) {
+                        var current = parseInt(count.textContent.trim(), 10) || 0;
+                        count.textContent = current + 1;
+                        count.classList.add('countPill--positive');
+
+                        crt.querySelector('.ac').textContent = "Added!";
+                        setTimeout(() => {
+                            crt.querySelector('.ac').textContent = crt.classList.contains('preorder-btn') ? "Pre Order" : "Add to Cart";
+                            crt.style.backgroundColor = "black";
+                            crt.querySelector('.ac').style.color = "white";
+                            crt.querySelector('svg').style.fill = "white";
+                            crt.removeAttribute('disabled');
+                        }, 2500);
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+            }
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (e) {
+        document.querySelectorAll('.dropdown--j').forEach(dropdown => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.querySelector('.dropdown-menu--j').classList.remove('show--j');
+                dropdown.querySelector('.chevron--j').classList.remove('up--j');
+            }
+        });
+    });
+}
 </script>
-
-
 
 {{/partial}}
 {{> layout/base}}

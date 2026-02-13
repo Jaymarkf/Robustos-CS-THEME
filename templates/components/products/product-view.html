@@ -170,7 +170,6 @@
                     <span>{{product.call_for_price}}</span>
                 </p>
             {{/if}}
-            {{#unless customer_group_id theme_settings.customer_group_restriction_id}}
             <div class="productView-price">
                 {{#or customer (unless settings.hide_price_from_guests)}}
                     {{> components/products/price price=product.price}}
@@ -178,7 +177,6 @@
                     {{> components/common/login-for-pricing}}
                 {{/or}}
             </div>
-            {{/unless}}
             {{{region name="product_below_price"}}}
             <div class="productView-rating">
                 {{#if settings.show_product_rating}}
@@ -328,7 +326,7 @@
                         <span data-product-stock>{{product.stock_level}}</span>
                     </label>
                 </div>
-                {{#unless customer_group_id theme_settings.customer_group_restriction_id}}
+              
                 {{> components/products/add-to-cart with_wallet_buttons=true}}
                 {{#if product.out_of_stock}}
                     {{#if product.out_of_stock_message}}
@@ -337,7 +335,6 @@
                         {{> components/common/alert/alert-error (lang 'products.sold_out')}}
                     {{/if}}
                 {{/if}}
-                {{/unless}}
             </form>
         </div>
         {{!--

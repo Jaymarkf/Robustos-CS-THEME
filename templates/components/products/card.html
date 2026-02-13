@@ -214,7 +214,7 @@
                 {{name}}
             </a>
         </h3>
-       {{#unless customer_group_id theme_settings.customer_group_restriction_id}}
+
         <div class="card-text" data-test-info-type="price">
             {{#or customer (unless settings.hide_price_from_guests)}}
                 {{> components/products/price price=price}}
@@ -224,7 +224,6 @@
         </div>
         {{{region name="product_item_below_price"}}}
         {{> components/products/bulk-discount-rates}}
-       {{/unless}}
     </div>
     
 </article>

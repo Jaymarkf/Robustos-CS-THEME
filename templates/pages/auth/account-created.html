@@ -8,11 +8,3 @@
     </main>
 {{/partial}}
 {{> layout/base}}
-{{#if customer}}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const CUSTOMER_URL = "https://assign-wholesale-customer-group-bc.pages.dev/customer/{{customer.id}}";
-    fetch(CUSTOMER_URL);
-    });
-</script>
-{{/if}}

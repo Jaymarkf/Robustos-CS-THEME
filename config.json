@@ -1,5 +1,5 @@
 {
-  "name": "07-09-2025 Crown USA WHOLESALE",
+  "name": "13-07-2025 CS Updated",
   "version": "6.16.1",
   "template_engine": "handlebars_v4",
   "meta": {
@@ -398,9 +398,7 @@
     "afterpay-button-color": "black-mint",
     "amazon-button-color": "Gold",
     "masterpass-button-color": "black",
-    "paymentbuttons-provider-sorting": [
-
-    ]
+    "paymentbuttons-provider-sorting": []
   },
   "read_only_files": [
     "/assets/scss/components/citadel",
@@ -438,8 +436,7 @@
           "home_garden"
         ]
       },
-      "images": {
-      },
+      "images": {},
       "settings": {
         "channels": [
           {
@@ -464,7 +461,6 @@
             "switch_url": "https://cornerstone-warm-demo.mybigcommerce.com"
           }
         ],
-        "customer_group_restriction_id": 1,
         "show_channels": false,
         "hide_breadcrumbs": false,
         "hide_page_heading": false,
@@ -796,9 +792,7 @@
         "afterpay-button-color": "black-mint",
         "amazon-button-color": "Gold",
         "masterpass-button-color": "black",
-        "paymentbuttons-provider-sorting": [
-
-        ]
+        "paymentbuttons-provider-sorting": []
       }
     },
     {

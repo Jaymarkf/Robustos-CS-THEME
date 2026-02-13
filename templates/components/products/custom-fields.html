@@ -1,13 +1,7 @@
 {{#each product.custom_fields}}
-{{#unless name '==' 'wholesale_price'}}
-{{#contains name 'wholesale_sku'}}
-
+{{#inArray (split 'Rating|Rating By|Badge|cigar count|cigar text' '|') name}}
 {{else}}
-    {{#inArray (split 'Rating|Rating By|Badge|cigar count|cigar text' '|') name}}
-    {{else}}
-    <dt class="productView-info-name">{{name}}:</dt>
-    <dd class="productView-info-value">{{{value}}}</dd>
-    {{/inArray}}
-{{/contains}}
-{{/unless}}
+<dt class="productView-info-name">{{name}}:</dt>
+<dd class="productView-info-value">{{{value}}}</dd>
+{{/inArray}}
 {{/each}}
