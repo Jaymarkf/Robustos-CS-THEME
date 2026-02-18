@@ -239,8 +239,6 @@ function callOptions(){
         });
 
         var bs = data.data.site.products.edges;
-        console.log(bs);
-
         bs.forEach(function(els) {
             const node = els.node;
             const variants = node.variants?.edges || [];

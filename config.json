@@ -1,5 +1,5 @@
 {
-  "name": "13-07-2025 CS Updated",
+  "name": "CS-Latest 6.18.2 MOD v1.1 D-14-02-2026",
   "version": "6.18.2",
   "template_engine": "handlebars_v4",
   "meta": {
@@ -401,7 +401,9 @@
     "afterpay-button-color": "black-mint",
     "amazon-button-color": "Gold",
     "masterpass-button-color": "black",
-    "paymentbuttons-provider-sorting": []
+    "paymentbuttons-provider-sorting": [
+
+    ]
   },
   "read_only_files": [
     "/assets/scss/components/citadel",
@@ -439,7 +441,8 @@
           "home_garden"
         ]
       },
-      "images": {},
+      "images": {
+      },
       "settings": {
         "channels": [
           {
@@ -570,6 +573,9 @@
         "color-greyLight": "#999999",
         "color-greyLighter": "#cccccc",
         "color-greyLightest": "#e5e5e5",
+        "color-coupon-pill-background": "#fafafa",
+        "color-coupon-pill-border": "#E5E7EB",
+        "color-coupon-pill-text": "#333333",
         "banner--default-backgroundColor": "#707070",
         "button--default-color": "#666666",
         "button--default-colorHover": "#333333",
@@ -795,7 +801,9 @@
         "afterpay-button-color": "black-mint",
         "amazon-button-color": "Gold",
         "masterpass-button-color": "black",
-        "paymentbuttons-provider-sorting": []
+        "paymentbuttons-provider-sorting": [
+
+        ]
       }
     },
     {

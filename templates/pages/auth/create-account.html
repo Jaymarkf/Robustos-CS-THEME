@@ -35,6 +35,28 @@
             document.querySelector('#FormField_33').remove();
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded",function(){
+            const pass_parent = document.querySelectorAll('.password-section');
+            pass_parent.forEach(function(el){
+               const passwordInput = el.previousElementSibling || null;
+               const openEye = el.querySelector('#open-eye');
+               const closeEye = el.querySelector('#close-eye');
+               if(passwordInput == null){
+                    el.remove();
+               }else{
+                    el.addEventListener("click",()=>{
+                        const isPassword = passwordInput.type === "password";
+                        passwordInput.type = isPassword ? "text" : "password";
+
+                        // Toggle which eye is visible
+                        openEye.style.display = isPassword ? "none" : "block";
+                        closeEye.style.display = isPassword ? "block" : "none";
+                    })
+               }
+            });
+        });
+    </script>
 {{/partial}}
 {{> layout/base}}
 

@@ -203,7 +203,7 @@
             <script>
                 document.addEventListener("DOMContentLoaded",function(){
                     if (navigator.platform.indexOf('Mac') > -1) {
-                        console.log(navigator.platform); // Check what value it logs
+                    
                         const mainCategoryContainer = document.querySelector('.col-main-category-container');
                         const productBadgesContainer = document.querySelector('.container-product-badges');
                         const cigarRatingContainer = document.querySelector('.container-cigar-rating');
@@ -384,31 +384,74 @@
                 splide.mount();
                 });
             </script>
-        <script>
-                /**show and hide the search navigation bar**/
-                var x = document.querySelector('[search_trigger]');
-                var main_nav = document.querySelector('nav.navPages ul.navPages-list:not(.navPages-list--user)');
-                var hidden_search = document.querySelector('.con-in-nav-search');
-                var x_btn = document.querySelector('.button-x-navigation');
-                var nav_pages = document.querySelector('nav.navPages');
-                x.addEventListener('click',function(){  
-                    if(main_nav.style.display === 'none'){
-                        nav_pages.style.position = 'unset';
-                        main_nav.style.display = 'block';
-                        hidden_search.style.display = 'none';
-                    }else{
-                        nav_pages.style.position = 'relative';
-                        main_nav.style.display = 'none';
-                        hidden_search.style.display = 'block';
-                    }
-                    x_btn.addEventListener('click',function(){
-                        nav_pages.style.position = 'unset';
-                        main_nav.style.display = 'block';
-                        hidden_search.style.display = 'none';
-                    });
-                });
+            <script>
+                    /**show and hide the search navigation bar**/
+                    var x = document.querySelector('[search_trigger]');
+                    var main_nav = document.querySelector('nav.navPages ul.navPages-list:not(.navPages-list--user)');
+                    var hidden_search = document.querySelector('.con-in-nav-search');
+                    var x_btn = document.querySelector('.button-x-navigation');
+                    var nav_pages = document.querySelector('nav.navPages');
+                    // x.addEventListener('click',function(){  
+                    //     if(main_nav.style.display === 'none'){
+                    //         nav_pages.style.position = 'unset';
+                    //         main_nav.style.display = 'flex';
+                    //         hidden_search.style.display = 'none';
+                    //     }else{
+                    //         nav_pages.style.position = 'relative';
+                    //         main_nav.style.display = 'none';
+                    //         hidden_search.style.display = 'block';
+                    //     }
 
-        </script>
+                    //     x_btn.addEventListener('click',function(){
+                    //         nav_pages.style.position = 'unset';
+                    //         main_nav.style.display = 'flex';
+                    //         hidden_search.style.display = 'none';
+                    //     });
+                    // });
+                    x.addEventListener("click",function(){
+                        const csc = document.querySelector('[custom-search-container]');
+                        if (csc) {
+                            // Get computed style
+                            const style = window.getComputedStyle(csc);
+
+                            if (style.display === "flex") {
+                                csc.style.display = "none";
+                            } else {
+                                csc.style.display = "flex";
+                            }
+                        }
+                    });
+            </script>
+            <script>
+                function handleCustomSearchPosition() {
+                const splide = document.querySelector('#splide01');
+                const csc = document.querySelector('[custom-search-container]');
+                const containerFlex = document.querySelector('header.header .container-flex');
+
+                if (!splide || !csc || !containerFlex) return;
+
+                if (window.innerWidth <= 800) {
+                    // Mobile: move CSC after #splide01
+                    if (csc.nextElementSibling !== splide.nextElementSibling) {
+                        splide.parentNode.insertBefore(csc, splide.nextElementSibling);
+                    }
+                } else {
+                    // Desktop: move CSC back under .container-flex
+                    if (containerFlex.nextElementSibling !== csc) {
+                        containerFlex.parentNode.insertBefore(csc, containerFlex.nextElementSibling);
+                    }
+                }
+            }
+
+            // Run on load
+            window.addEventListener('DOMContentLoaded', handleCustomSearchPosition);
+
+            // Run on scroll
+            window.addEventListener('scroll', handleCustomSearchPosition);
+
+            // Run on resize
+            window.addEventListener('resize', handleCustomSearchPosition);
+            </script>
         {{!-- this is for temporary for full width banner of promotion and events and shipping and refund policy --}}
         {{#or (if page.title '==' 'Promotions') (if page.title '==' 'Events') (if page.title '==' 'Shipping & Refund Policy') (if page.title '==' 'Contact') (if page.title '==' 'Shipping Policy') (if page.title '==' 'Return and Refund Policy') (if page.title '==' 'About Us')}}
             <style>
@@ -448,30 +491,56 @@
             document.addEventListener("scroll", function () {
             const main = document.querySelector("header.header .container-flex");
             const header = document.querySelector("header.header");
-            
+            const redTopBar = document.querySelector("header.header nav.navUser");
+            const searchContainer = document.querySelector('[custom-search-container]');
+
+            if (!main || !header || !redTopBar || !searchContainer) return;
+
             // Get the height of <header>
             const headerBottom = header.getBoundingClientRect().bottom;
-            const redTopBar = document.querySelector('header.header nav.navUser');
             const heightTopBar = redTopBar.getBoundingClientRect().bottom;
 
-   
             if (headerBottom <= 0) {
-                // Make <main> sticky
+
+                // Make redTopBar fixed
                 redTopBar.style.position = "fixed";
+                redTopBar.style.top = "0";
+                redTopBar.style.width = "100%";
+
+                // Make main sticky under redTopBar
                 main.style.position = "fixed";
-                main.style.top =  heightTopBar + "px";
+                main.style.top = heightTopBar + "px";
                 main.style.zIndex = "1";
-                main.style.background = "white"; // Optional for visibility
+                main.style.background = "white";
                 main.style.width = "100%";
                 main.classList.add('script-sticky');
 
+                // Compute main height AFTER fixing it
+                const mainHeight = main.offsetHeight;
+
+                // Fix search container under both
+                searchContainer.style.position = "fixed";
+                searchContainer.style.top = (heightTopBar + mainHeight) + "px";
+                searchContainer.style.width = "100%";
+
             } else {
-                // Reset <main> to its original position
-                main.style.position = "";
+
+                // Reset everything cleanly
                 redTopBar.style.position = "";
-                main.classList.remove('script-sticky'); // Remove the class
+                redTopBar.style.top = "";
+                redTopBar.style.width = "";
+
+                main.style.position = "";
+                main.style.top = "";
+                main.style.width = "";
+                main.classList.remove('script-sticky');
+
+                searchContainer.style.position = "";
+                searchContainer.style.top = "";
+                searchContainer.style.width = "";
             }
-            });
+        });
+
         </script>
         {{#if template_file '==' 'pages/product'}}
         <script>
@@ -507,7 +576,57 @@
             });
         </script>
         {{/if}}
-        
+        <script>
+            document.addEventListener("DOMContentLoaded",function(){
+                const search_mobile = document.querySelector('[custom-search-container]');
+                const btn_search_mobile = document.querySelector('#search_mobile');
+
+                btn_search_mobile.addEventListener("click", () => {
+                    search_mobile.style.display = getComputedStyle(search_mobile).display === 'flex' ? 'none' : 'flex';
+                });
+
+            });    
+        </script>
+        <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const mainContent = document.getElementById("main-content");
+
+    function getFullHeight(el) {
+        if (!el || el.offsetParent === null) return 0; // skip hidden elements
+        const style = window.getComputedStyle(el);
+        const offsetHeight = el.offsetHeight;
+        const marginTop = parseFloat(style.marginTop) || 0;
+        const marginBottom = parseFloat(style.marginBottom) || 0;
+        return offsetHeight + marginTop + marginBottom;
+    }
+
+    function adjustMainMargin() {
+        const screenWidth = window.innerWidth;
+
+        if (screenWidth <= 800) {
+            // Delay calculation to wait for dynamic content like sliders
+            setTimeout(() => {
+                const header = document.querySelector("header.header");
+                const customSearch = document.querySelector("[custom-search-container]");
+                const splide = document.querySelector("#splide01");
+
+                const totalHeight = getFullHeight(header) + getFullHeight(customSearch) + getFullHeight(splide);
+
+                mainContent.style.marginTop = totalHeight + "px";
+            }, 1500); // 1.5 seconds
+        } else {
+            mainContent.style.marginTop = "";
+        }
+    }
+
+    // Trigger on load
+    adjustMainMargin();
+
+    // Trigger on resize
+    window.addEventListener("resize", adjustMainMargin);
+});
+</script>
+
     </body>
 
     <!-- for buy now html element and css -->
@@ -562,6 +681,4 @@
 
     </style>
     <!-- END -->
-
-
 </html>

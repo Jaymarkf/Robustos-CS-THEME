@@ -18,7 +18,13 @@
             </div>
             <div class="form-field">
                 <label class="form-label" for="login_pass">{{lang 'login.field_password'}}</label>
-                <input class="form-input" id="login_pass" type="password" name="login_pass" autocomplete="off">
+                
+                    <input class="form-input" id="login_pass" type="password" name="login_pass" autocomplete="off">
+                    <div class="password-section">
+                        <svg id="open-eye" title="show password"><use xlink:href="#icon-eye-open"></use></svg>
+                        <svg id="close-eye" title="hide password"><use xlink:href="#icon-eye-close"></use></svg>
+                    </div>
+           
             </div>
             <div class="form-actions">
                 <input type="submit" class="button button--primary" value="{{lang 'login.submit_value' }}">
@@ -47,5 +53,29 @@
         {{/if}}
     </div>
 </div>
+<style>
+    .form-field--success .form-input[type="text"]{
+        background-image:none !important;
+        border-color:unset !important;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded",function(){
+        const passwordInput = document.getElementById('login_pass');
+        const toggleButton = document.querySelector('.password-section');
+        const openEye = document.getElementById('open-eye');
+        const closeEye = document.getElementById('close-eye');
+
+        toggleButton.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+
+        // Toggle which eye is visible
+        openEye.style.display = isPassword ? 'none' : 'block';
+        closeEye.style.display = isPassword ? 'block' : 'none';
+        });
+
+    });
+</script>
 {{/partial}}
 {{> layout/base}}

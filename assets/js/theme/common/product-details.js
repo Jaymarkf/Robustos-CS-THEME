@@ -458,6 +458,11 @@ export default class ProductDetails extends ProductDetailsBase {
                 }
 
                 this.updateCartContent(this.previewModal, response.data.cart_item.id);
+                const parent = document.querySelector('[data-product-option-change]');
+                const form = parent.closest('form');
+
+                if (form) form.reset();
+
             } else {
                 this.$overlay.show();
                 // if no modal, redirect to the cart page
